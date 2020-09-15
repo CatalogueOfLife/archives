@@ -1,0 +1,193 @@
+<?php
+/**
+ * Annual Checklist Interface
+ *
+ * database.phtml
+ * Source database details view
+ *
+ * @category    ACI
+ * @package     application
+ * @subpackage  views/scripts
+ *
+ */
+?>
+<h1 class="page_header">
+<?php printf($this->title . ' : ' . $this->db['details_name'], '"' . $this->key . '"') ?>
+</h1>
+<?php
+if (is_array($this->db)):
+?>
+<div class="wrapLogo">
+    <div id="logo-image"><a href="<?php echo $this->db['web_link']; ?>" target="_blank"><img
+      src="<?php echo $this->baseUrl() . $this->db['image']; ?>"
+      alt="<?php echo $this->db['name']; ?>"
+      title="<?php echo $this->db['name']; ?>"
+    /></a></div>
+     <?php if ($this->indicatorsModuleEnabled) : ?>
+    <div id="database-qualifiers-table">
+        <table>
+        <tr class="even"><th colspan="2"><?php echo $this->translate('Database_qualifiers'); ?></th></tr>
+        <tr class="odd"><th><?php echo $this->translate('Coverage'); ?>:</th>
+        <td>
+        <?php if (!empty($this->db['coverage'])): ?>
+             <img src="<?php echo $this->baseUrl() .'/images/'. $this->db['coverage_icon']; ?>.png"
+            class="vertical-align" alt="" title="<?php echo $this->translate(ucfirst($this->db['coverage_icon'])) ?>" />
+            &nbsp;<?php echo $this->db['coverage']; ?>
+        <?php else: ?>
+            <?php echo $this->translate('Not_available'); ?>
+        <?php endif; ?>
+        </td></tr>
+        <tr class="even"><th><?php echo $this->translate('Completeness'); ?>:</th>
+        <td>
+        <?php if (!empty($this->db['completeness'])): ?>
+            <?php echo $this->db['completeness']; ?>%
+        <?php else: ?>
+            <?php echo $this->translate('Not_available'); ?>
+        <?php endif; ?>
+        </td></tr>
+        <tr class="odd"><th><?php echo $this->translate('Checklist_confidence'); ?>:</th>
+        <td>
+        <?php if (!empty($this->db['confidence_icons'])): ?>
+            <span title="<?php echo $this->translate('db_confidence_'.$this->db['confidence'].'_star_title'); ?>">
+            <?php foreach ($this->db['confidence_icons'] as $icon): ?>
+                <img src="<?php echo $this->baseUrl() .'/images/'. $icon; ?>.png" alt="" width="17" height="16" />
+            <?php endforeach; ?>
+            </span>
+        <?php else: ?>
+            <?php echo $this->translate('Not_available'); ?>
+        <?php endif; ?>
+        </td></tr>
+        </table>
+    </div>
+    <?php endif; ?>
+    <div class="clear"></div>
+</div>
+<table class="details-table">
+<?php $rowClass = "even"?>
+    <tr class="<?php echo $rowClass; ?>">
+        <th class="vertical"><?php echo $this->translate('Full_name'); ?>:</th>
+        <td><?php echo $this->db['details_name']; ?>
+        <?php if (!empty($this->db['is_new'])): ?>
+             <span class="new"><?php echo $this->db['is_new']?></span>
+        <?php endif; ?>
+        </td>
+    </tr>
+<?php $rowClass = ($rowClass == "odd" ? "even" : "odd"); ?>
+    <tr class="<?php echo $rowClass; ?>">
+        <th class="vertical"><?php echo $this->translate('Short_name'); ?>:</th>
+        <td><?php echo $this->db['database_name']; ?></td>
+    </tr>
+<?php $rowClass = ($rowClass == "odd" ? "even" : "odd"); ?>
+    <tr class="<?php echo $rowClass; ?>">
+        <th class="vertical"><?php echo $this->translate('Version'); ?>:</th>
+        <td><?php echo $this->db['version']; ?></td>
+    </tr>
+<?php $rowClass = ($rowClass == "odd" ? "even" : "odd"); ?>
+    <tr class="<?php echo $rowClass; ?>">
+        <th class="vertical"><?php echo $this->translate('Release_date'); ?>:</th>
+        <td><?php echo $this->db['release_date']; ?></td>
+    </tr>
+<?php $rowClass = ($rowClass == "odd" ? "even" : "odd"); ?>
+    <tr class="<?php echo $rowClass; ?>">
+        <th class="vertical"><?php echo $this->translate('Authors_editors'); ?>:</th>
+        <td><?php echo $this->db['authors_editors']; ?></td>
+    </tr>
+<?php $rowClass = ($rowClass == "odd" ? "even" : "odd"); ?>
+    <tr class="<?php echo $rowClass; ?>">
+        <th class="vertical"><?php echo $this->translate('Taxonomic_coverage'); ?>:</th>
+        <td><?php echo $this->db['taxonomic_coverage']; ?></td>
+    </tr>
+<?php $rowClass = ($rowClass == "odd" ? "even" : "odd"); ?>
+    <tr class="<?php echo $rowClass; ?>">
+        <th class="vertical"><?php echo $this->translate('English_name_of_the_group'); ?>:</th>
+        <td><?php echo $this->db['taxa']; ?></td>
+    </tr>
+<?php $rowClass = ($rowClass == "odd" ? "even" : "odd"); ?>
+    <tr class="<?php echo $rowClass; ?>">
+        <th class="vertical">
+        <?php if ($this->fossilsModuleEnabled): ?>
+            <?php echo $this->translate('Number_of_living_species'); ?>
+        <?php else: ?>
+            <?php echo $this->translate('Number_of_species_names'); ?>
+        <?php endif; ?>
+        </th>
+        <td><?php echo $this->db['accepted_species_names']; ?></td>
+    </tr>
+<?php $rowClass = ($rowClass == "odd" ? "even" : "odd"); ?>
+    <tr class="<?php echo $rowClass; ?>">
+        <th class="vertical">
+        <?php if ($this->fossilsModuleEnabled): ?>
+            <?php echo $this->translate('Number_of_living_infraspecies'); ?>
+        <?php else: ?>
+            <?php echo $this->translate('Number_of_infraspecies_names'); ?>
+        <?php endif; ?>
+        </th>
+        <td><?php echo $this->db['accepted_infraspecies_names']; ?></td>
+    </tr>
+<?php if ($this->fossilsModuleEnabled): ?>
+    <?php $rowClass = ($rowClass == "odd" ? "even" : "odd"); ?>
+        <tr class="<?php echo $rowClass; ?>">
+            <th class="vertical"><?php echo $this->translate('Number_of_extinct_species'); ?>:</th>
+            <td><?php echo $this->db['accepted_extinct_species_names']; ?></td>
+        </tr>
+    <?php $rowClass = ($rowClass == "odd" ? "even" : "odd"); ?>
+        <tr class="<?php echo $rowClass; ?>">
+            <th class="vertical"><?php echo $this->translate('Number_of_extinct_infraspecies'); ?>:</th>
+            <td><?php echo $this->db['accepted_extinct_infraspecies_names']; ?></td>
+        </tr>
+<?php endif; ?>
+<?php $rowClass = ($rowClass == "odd" ? "even" : "odd"); ?>
+    <tr class="<?php echo $rowClass; ?>">
+        <th class="vertical"><?php echo $this->translate('Number_of_synonyms'); ?>:</th>
+        <td><?php echo ($this->db['total_synonyms']); ?></td>
+    </tr>
+<?php $rowClass = ($rowClass == "odd" ? "even" : "odd"); ?>
+    <tr class="<?php echo $rowClass; ?>">
+        <th class="vertical"><?php echo $this->translate('Number_of_common_names'); ?>:</th>
+        <td><?php echo $this->db['common_names']; ?></td>
+    </tr>
+<?php $rowClass = ($rowClass == "odd" ? "even" : "odd"); ?>
+    <tr class="<?php echo $rowClass; ?>">
+        <th class="vertical"><?php echo $this->translate('Total_number_of_names'); ?>:</th>
+        <td>
+        <?php if ($this->fossilsModuleEnabled): ?>
+            <?php echo $this->db['total_names']; ?>
+        <?php else: ?>
+            <?php echo $this->db['total_extant_names']; ?>
+        <?php endif; ?>
+        </td>
+    </tr>
+<?php $rowClass = ($rowClass == "odd" ? "even" : "odd"); ?>
+    <tr class="<?php echo $rowClass; ?>">
+        <th class="vertical"><?php echo $this->translate('Abstract'); ?>:</th>
+        <td><?php echo $this->db['abstract']; ?></td>
+    </tr>
+<?php $rowClass = ($rowClass == "odd" ? "even" : "odd"); ?>
+    <tr class="<?php echo $rowClass; ?>">
+        <th class="vertical"><?php echo $this->translate('Organization'); ?>:</th>
+        <td><?php echo $this->db['organization']; ?></td>
+    </tr>
+<?php $rowClass = ($rowClass == "odd" ? "even" : "odd"); ?>
+    <tr class="<?php echo $rowClass; ?>">
+        <th class="vertical"><?php echo $this->translate('Web_site'); ?>:</th>
+        <td>
+            <?php foreach ($this->db['web_sites'] as $website): ?>
+            <?php echo $website . '<br />'; ?>
+            <?php endforeach; ?>
+        </td>
+    </tr>
+
+</table>
+<?php else: ?>
+<p><?php echo $this->translate('Database_not_found'); ?></p>
+<br/>
+<?php endif; ?>
+<br/>
+<div class="page_links">
+<a href="javascript:history.back()">
+    <?php echo $this->translate('Back_to_last_page'); ?>
+</a> |
+<a href="<?php echo $this->baseUrl() . '/' . $this->latestSearch; ?>">
+    <?php echo $this->translate('New_search'); ?>
+</a>
+</div>

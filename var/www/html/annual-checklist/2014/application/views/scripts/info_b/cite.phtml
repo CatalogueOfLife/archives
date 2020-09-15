@@ -1,0 +1,38 @@
+<?php
+/**
+ * Annual Checklist Interface
+ *
+ * cite.phtml
+ * Info - How to cite this work page view
+ *
+ * @category    ACI
+ * @package     application
+ * @subpackage  views/scripts
+ *
+ */
+?>
+<div class="page_header">
+<?php
+echo $this->translate('Cite_work')?>
+</div>
+<?php
+echo $this->navigator_top;
+?>
+<div class="info_content">
+
+<p class="field_header">How to cite the Catalogue of Life monthly edition on the Web:</p>
+<p>
+Roskov Y., Kunze T., Paglinawan L., Abucay L., Orrell T., Nicolson D., Culham A., Bailly N., Kirk P., Bourgoin T., Baillargeon G., Hernandez F., De Wever A., Didžiulis V., eds (2013). Species 2000 & ITIS Catalogue of Life, 15th August 2013. Digital resource at www.catalogueoflife.org/col. Species 2000: Reading, UK. 
+</p>
+
+<p class="field_header">How to cite the Annual Checklist on DVD:</p>
+<p>
+Roskov Y., Kunze T., Paglinawan L., Orrell T., Nicolson D., Culham A., Bailly N., Kirk P., Bourgoin T., Baillargeon G., Hernandez F., De Wever A., eds (2013). Species 2000 & ITIS Catalogue of Life, 2013 Annual Checklist. DVD; Species 2000: Reading, UK.</p> 
+
+<p class="field_header">How to cite individual databases included in this work:</p>
+
+<?php include 'citelist.html'?>
+</div>
+<?php
+echo $this->navigator_bottom;
+?>

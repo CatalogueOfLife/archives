@@ -1,0 +1,109 @@
+---
+- name: Update /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    regexp: '^127.0.1.1[ \t]+ubuntu-bionic[ \t]+ubuntu-bionic'
+    line: '127.0.1.1    {{ host.fqdn }}   {{ host.short }}'
+    state: present
+    backrefs: yes
+  tags: hostname
+
+- name: Auto-remove unneeded dependencies and auto-clean
+  apt:
+    autoremove=yes
+    autoclean=yes
+  tags: software
+
+- debug:
+    msg: Database password is {{ DATABASE_PASSWORD }}
+
+- name: Configure 2005ac database password
+  lineinfile:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2005/connect_to_database.php
+    regexp: '.*\$link.*'
+    line: '$link = mysql_connect("database", "root", "{{ DATABASE_PASSWORD }}") or die("Error: connection failure: " . mysql_error());'
+
+- name: Configure 2006ac database password
+  lineinfile:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2006/ac_config.php
+    regexp: '.*\$sql_password.*'
+    line: '$sql_password = "{{ DATABASE_PASSWORD }}" ;'
+
+- name: Configure 2007ac database password
+  lineinfile:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2007/ac_config.php
+    regexp: '.*\$sql_password.*'
+    line: '$sql_password = "{{ DATABASE_PASSWORD }}" ;'
+
+- name: Configure 2008ac database password
+  lineinfile:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2008/ac_config.php
+    regexp: '.*\$sql_password.*'
+    line: '$sql_password = "{{ DATABASE_PASSWORD }}" ;'
+
+- name: Configure 2009ac database password
+  lineinfile:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2009/includes/config.php
+    regexp: '.*\$sql_password.*'
+    line: '$sql_password = "{{ DATABASE_PASSWORD }}" ;'
+
+- name: Configure 2010ac database password
+  lineinfile:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2010/application/configs/config.ini
+    regexp: '.*database.params.password.*'
+    line: 'database.params.password = {{ DATABASE_PASSWORD }}'
+
+- name: Configure 2011ac database password
+  lineinfile:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2011/application/configs/config.ini
+    regexp: '.*database.params.password.*'
+    line: 'database.params.password = {{ DATABASE_PASSWORD }}'
+
+- name: Configure 2012ac database password
+  lineinfile:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2012/application/configs/config.ini
+    regexp: '.*database.params.password.*'
+    line: 'database.params.password = {{ DATABASE_PASSWORD }}'
+
+- name: Configure 2013ac database password
+  lineinfile:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2013/application/configs/config.ini
+    regexp: '.*database.params.password.*'
+    line: 'database.params.password = {{ DATABASE_PASSWORD }}'
+
+- name: Configure 2014ac database password
+  lineinfile:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2014/application/configs/config.ini
+    regexp: '.*database.params.password.*'
+    line: 'database.params.password = {{ DATABASE_PASSWORD }}'
+
+- name: Configure 2015ac database password
+  lineinfile:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2015/application/configs/config.ini
+    regexp: '.*database.params.password.*'
+    line: 'database.params.password = {{ DATABASE_PASSWORD }}'
+
+- name: Configure 2016ac database password
+  lineinfile:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2016/application/configs/config.ini
+    regexp: '.*database.params.password.*'
+    line: 'database.params.password = {{ DATABASE_PASSWORD }}'
+
+- name: Configure 2017ac database password
+  lineinfile:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2017/application/configs/config.ini
+    regexp: '.*database.params.password.*'
+    line: 'database.params.password = {{ DATABASE_PASSWORD }}'
+
+- name: Configure 2018ac database password
+  lineinfile:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2018/application/configs/config.ini
+    regexp: '.*database.params.password.*'
+    line: 'database.params.password = {{ DATABASE_PASSWORD }}'
+
+- name: Configure 2019ac database password
+  lineinfile:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2019/application/configs/config.ini
+    regexp: '.*database.params.password.*'
+    line: 'database.params.password = {{ DATABASE_PASSWORD }}'
+

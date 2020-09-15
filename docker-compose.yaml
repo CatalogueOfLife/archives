@@ -1,0 +1,49 @@
+version: '3.7'
+services:
+  database:
+    image: mysql:5.7
+    ports:
+      - "3399:3306"
+    volumes:
+      - ./data:/home/col/data
+      - ./var/lib/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
+      MYSQL_DATABASE: col
+    command: ['mysqld', '--character-set-server=utf8', '--collation-server=utf8_general_ci', '--default_storage_engine=MYISAM', '--secure-file-priv=', '--default-authentication-plugin=mysql_native_password', '--initialize-insecure=false', '--sql-mode=']
+  httpd:
+    build:
+      context: .
+      dockerfile: ./docker/httpd.Dockerfile
+      args:
+        DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+    ports:
+      - "2500:80"
+    volumes:
+      - ./etc/ansible:/etc/ansible
+      - ./etc/apache2:/etc/apache2
+      #- ./var/www/html:/usr/lib/apache2/htdocs
+      - ./ansible:/home/col/ansible
+      - ./var/log:/var/log
+    environment:
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      APACHE_RUN_DIR: /usr/lib/apache2
+      APACHE_PID_FILE: /usr/lib/apache2/apache2.pid
+      APACHE_RUN_USER: www-data
+      APACHE_RUN_GROUP: www-data
+      APACHE_LOG_DIR: /var/log/apache2
+    entrypoint: ['/usr/sbin/apachectl', '-D', 'FOREGROUND']
+    tty: true
+#  provision:
+#    build:
+#      context: .
+#      dockerfile: ./docker/provision.Dockerfile
+#    depends_on:
+#      - database
+#    volumes:
+#      - ./data:/home/col/data
+#      - ./scripts:/home/col/scripts
+#    environment:
+#      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+#    entrypoint: python /home/col/scripts/provision.py
+#    tty: true

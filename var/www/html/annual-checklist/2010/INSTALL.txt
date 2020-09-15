@@ -1,0 +1,100 @@
+The Annual Checklist Interface is built on version 1.9.5 of the Zend Framework.
+Please visit http://framework.zend.com for more information.
+
+SYSTEM REQUIREMENTS
+====================
+PHP  
+  Required version: 5.2.10+
+
+  * Extensions:
+    ctype   (http://www.php.net/manual/en/ref.ctype.php)
+    json    (http://www.php.net/manual/en/ref.json.php)
+    mysqli  (http://www.php.net/manual/en/ref.mysqli.php)
+    pcre    (http://www.php.net/manual/en/ref.pcre.php)
+    session (http://www.php.net/manual/en/ref.session.php)
+  
+MySQL
+  Required version: 5.0+
+
+Apache
+  Required version: 2.0+
+
+  * Modules:
+    mod_rewrite (http://httpd.apache.org/docs/2.0/mod/mod_rewrite.html)
+    
+
+INSTALLATION
+=============
+1. Deploy the application
+
+   Extract the application into the desired folder of the web server.
+
+2. Set up permissions
+
+   The web server has to have read access to all the files and read-write 
+   access to the following folders:
+
+   application/cache --> Cached query results are stored in this folder
+   application/log   --> Any error that may occur will be logger here
+   
+   Example (assuming that the web server user:group is www-data:www-data): 
+   
+   $ chown -R www-data:www-data path/to/application
+   $ chmod -R 750 path/to/application
+
+3. Configure the application
+
+   Edit the file path/to/application/application/configs/config.ini to set the 
+   database connection paramters and the Google Analytics tracker id (if any, 
+   otherwise leave it empty):
+
+   [production]
+   # Database
+   database.params.host     = localhost
+   database.params.username = here-your-username
+   database.params.password = here-your-password
+   database.params.dbname   = here-the-name-of-the-db
+    
+   # Google Analytics Tracker Id
+   view.googleAnalytics.trackerId = UA-xxxxxxx-x
+
+4. Configure Apache
+
+   Create an alias inside the Apache VirtualHost in port 80 that points to the 
+   *public* folder of the application.
+   
+   Example:
+   
+   Alias / "/path/to/application/public/"
+   <Directory "/path/to/application/public/">
+       Options Indexes MultiViews FollowSymLinks
+       AllowOverride FileInfo Options
+       Order allow,deny
+       Allow from all
+   </Directory>
+   
+   This configuration will make the application run in the root of the server
+   domain. It is important to add this Alias directive after the other Alias
+   not to override them.
+   
+   If the application has to run in a subdomain, then replace the alias 
+   accordingly:
+   
+   Alias /path/to/subdomain "/path/to/application/public/"
+   <Directory "/path/to/application/public/">
+       Options Indexes MultiViews FollowSymLinks
+       AllowOverride FileInfo Options
+       Order allow,deny
+       Allow from all
+   </Directory>
+   
+   IMPORTANT: When running the application in a subdomain it is necessary to
+   edit the /path/to/application/public/.htaccess file to update the 
+   RewriteBase parameter accordingly:
+   
+   RewriteBase /path/to/subdomain/
+   
+   Finally, restart Apache to have the changes applied. 
+   
+   NOTE: If the application does not load as expected, checking the Apache logs 
+   may help to identify the problem.
