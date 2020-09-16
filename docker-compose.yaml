@@ -11,12 +11,14 @@ services:
       MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
       MYSQL_DATABASE: col
     command: ['mysqld', '--character-set-server=utf8', '--collation-server=utf8_general_ci', '--default_storage_engine=MYISAM', '--secure-file-priv=', '--default-authentication-plugin=mysql_native_password', '--initialize-insecure=false', '--sql-mode=']
-  httpd:
+  checklists:
     build:
       context: .
       dockerfile: ./docker/httpd.Dockerfile
       args:
         DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+    depends_on:
+      - database
     ports:
       - "2500:80"
     volumes:
@@ -34,16 +36,16 @@ services:
       APACHE_LOG_DIR: /var/log/apache2
     entrypoint: ['/usr/sbin/apachectl', '-D', 'FOREGROUND']
     tty: true
-#  provision:
-#    build:
-#      context: .
-#      dockerfile: ./docker/provision.Dockerfile
-#    depends_on:
-#      - database
-#    volumes:
-#      - ./data:/home/col/data
-#      - ./scripts:/home/col/scripts
-#    environment:
-#      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-#    entrypoint: python /home/col/scripts/provision.py
-#    tty: true
+  provision:
+    build:
+      context: .
+      dockerfile: ./docker/provision.Dockerfile
+    depends_on:
+      - database
+    volumes:
+      - ./data:/home/col/data
+      - ./scripts:/home/col/scripts
+    environment:
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+    entrypoint: python /home/col/scripts/provision.py
+    tty: true
