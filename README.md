@@ -4,16 +4,16 @@
 
 1. Download the database dumps into the data directory.
 
-2. To build the images run:
+2. Provisioning the database will take a few hours, but it only needs to be done once with the command:
 
 ```
-DATABASE_PASSWORD=pwd_here docker-compose build
+DATABASE_PASSWORD={password} docker-compose up provision
 ```
 
-3. To run the annual checklist archives run:
+3. To run the CoL annual checklist archives run:
 
 ```
-docker-compose up
+DATABASE_PASSWORD={password} docker-compose up checklists
 ```
 
 Tentatively the annual checklist will run at:
@@ -33,4 +33,3 @@ Tentatively the annual checklist will run at:
 - http://localhost:2500/annual-checklist/2017
 - http://localhost:2500/annual-checklist/2018
 - http://localhost:2500/annual-checklist/2019
-
