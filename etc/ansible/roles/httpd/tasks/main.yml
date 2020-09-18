@@ -28,12 +28,14 @@
     path: /usr/lib/apache2/htdocs/annual-checklist/2006/ac_config.php
     regexp: '.*\$sql_password.*'
     line: '$sql_password = "{{ DATABASE_PASSWORD }}" ;'
+    firstmatch: yes
 
 - name: Configure 2007ac database password
   lineinfile:
     path: /usr/lib/apache2/htdocs/annual-checklist/2007/ac_config.php
     regexp: '.*\$sql_password.*'
     line: '$sql_password = "{{ DATABASE_PASSWORD }}" ;'
+    firstmatch: yes
 
 - name: Configure 2008ac database password
   lineinfile:
@@ -108,54 +110,64 @@
     line: 'database.params.password = {{ DATABASE_PASSWORD }}'
 
 - name: Create ac2019 log directory
-  - file:
-      path: /usr/lib/apache2/htdocs/annual-checklist/2019/application/log
-      state: directory
+  file:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2019/application/log
+    state: directory
+    mode: 0755
 
 - name: Create ac2018 log directory
-  - file:
-      path: /usr/lib/apache2/htdocs/annual-checklist/2018/application/log
-      state: directory
+  file:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2018/application/log
+    state: directory
+    mode: 0755
 
 - name: Create ac2017 log directory
-  - file:
-      path: /usr/lib/apache2/htdocs/annual-checklist/2017/application/log
-      state: directory
+  file:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2017/application/log
+    state: directory
+    mode: 0755
 
 - name: Create ac2016 log directory
-  - file:
-      path: /usr/lib/apache2/htdocs/annual-checklist/2016/application/log
-      state: directory
+  file:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2016/application/log
+    state: directory
+    mode: 0755
 
 - name: Create ac2015 log directory
-  - file:
-      path: /usr/lib/apache2/htdocs/annual-checklist/2015/application/log
-      state: directory
+  file:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2015/application/log
+    state: directory
+    mode: 0755
 
 - name: Create ac2014 log directory
-  - file:
-      path: /usr/lib/apache2/htdocs/annual-checklist/2014/application/log
-      state: directory
+  file:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2014/application/log
+    state: directory
+    mode: 0755
 
 - name: Create ac2013 log directory
-  - file:
-      path: /usr/lib/apache2/htdocs/annual-checklist/2013/application/log
-      state: directory
+  file:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2013/application/log
+    state: directory
+    mode: 0755
 
 - name: Create ac2012 log directory
-  - file:
-      path: /usr/lib/apache2/htdocs/annual-checklist/2012/application/log
-      state: directory
+  file:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2012/application/log
+    state: directory
+    mode: 0755
 
 - name: Create ac2011 log directory
-  - file:
-      path: /usr/lib/apache2/htdocs/annual-checklist/2011/application/log
-      state: directory
+  file:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2011/application/log
+    state: directory
+    mode: 0755
 
 - name: Create ac2010 log directory
-  - file:
-      path: /usr/lib/apache2/htdocs/annual-checklist/2010/application/log
-      state: directory
+  file:
+    path: /usr/lib/apache2/htdocs/annual-checklist/2010/application/log
+    state: directory
+    mode: 0755
 
 - name: Set permissions on annual-checklists
   file:
