@@ -4,32 +4,36 @@
 
 1. Download the database dumps into the data directory.
 
-2. Provisioning the database will take a few hours, but it only needs to be done once with the command:
+(GBIF has a copy on NFS at `col/archives`.)
+
+2. Provisioning the database will take a few hours, but it only needs to be done once with the commands:
 
 ```
-DATABASE_PASSWORD={password} docker-compose up provision
+echo DATABASE_PASSWORD=$(< /dev/urandom tr -dc _A-Za-z0-9- | head -c${1:-20}) > .env
+docker-compose up database
+docker-compose run provision
 ```
 
 3. To run the CoL annual checklist archives run:
 
 ```
-DATABASE_PASSWORD={password} docker-compose up checklists
+docker-compose up checklists
 ```
 
 Tentatively the annual checklist will run at:
 
-- http://localhost:2500/annual-checklist/2005
-- http://localhost:2500/annual-checklist/2006
-- http://localhost:2500/annual-checklist/2007
-- http://localhost:2500/annual-checklist/2008
-- http://localhost:2500/annual-checklist/2009
-- http://localhost:2500/annual-checklist/2010
-- http://localhost:2500/annual-checklist/2011
-- http://localhost:2500/annual-checklist/2012
-- http://localhost:2500/annual-checklist/2013
-- http://localhost:2500/annual-checklist/2014
-- http://localhost:2500/annual-checklist/2015
-- http://localhost:2500/annual-checklist/2016
-- http://localhost:2500/annual-checklist/2017
-- http://localhost:2500/annual-checklist/2018
-- http://localhost:2500/annual-checklist/2019
+- http://localhost/annual-checklist/2005
+- http://localhost/annual-checklist/2006
+- http://localhost/annual-checklist/2007
+- http://localhost/annual-checklist/2008
+- http://localhost/annual-checklist/2009
+- http://localhost/annual-checklist/2010
+- http://localhost/annual-checklist/2011
+- http://localhost/annual-checklist/2012
+- http://localhost/annual-checklist/2013
+- http://localhost/annual-checklist/2014
+- http://localhost/annual-checklist/2015
+- http://localhost/annual-checklist/2016
+- http://localhost/annual-checklist/2017
+- http://localhost/annual-checklist/2018
+- http://localhost/annual-checklist/2019
