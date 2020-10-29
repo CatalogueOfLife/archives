@@ -37,3 +37,21 @@ Tentatively the annual checklist will run at:
 - http://localhost/annual-checklist/2017
 - http://localhost/annual-checklist/2018
 - http://localhost/annual-checklist/2019
+
+With the current DNS, they are available at:
+
+- http://archives.catalogueoflife.org/annual-checklist/2005
+- http://archives.catalogueoflife.org/annual-checklist/2006
+- http://archives.catalogueoflife.org/annual-checklist/2007
+- http://archives.catalogueoflife.org/annual-checklist/2008
+- http://archives.catalogueoflife.org/annual-checklist/2009
+- http://archives.catalogueoflife.org/annual-checklist/2010
+- http://archives.catalogueoflife.org/annual-checklist/2011
+- http://archives.catalogueoflife.org/annual-checklist/2012
+- http://archives.catalogueoflife.org/annual-checklist/2013
+- http://archives.catalogueoflife.org/annual-checklist/2014
+- http://archives.catalogueoflife.org/annual-checklist/2015
+- http://archives.catalogueoflife.org/annual-checklist/2016
+- http://archives.catalogueoflife.org/annual-checklist/2017
+- http://archives.catalogueoflife.org/annual-checklist/2018
+- http://archives.catalogueoflife.org/annual-checklist/2019
