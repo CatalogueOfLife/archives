@@ -10,7 +10,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
       MYSQL_DATABASE: col
-    command: ['mysqld', '--character-set-server=utf8', '--collation-server=utf8_general_ci', '--default_storage_engine=MYISAM', '--secure-file-priv=', '--default-authentication-plugin=mysql_native_password', '--initialize-insecure=false', '--sql-mode=']
+    command: ['mysqld', '--character-set-server=utf8', '--collation-server=utf8_general_ci', '--default_storage_engine=MYISAM', '--secure-file-priv=', '--default-authentication-plugin=mysql_native_password', '--initialize-insecure=false', '--sql-mode=', '--innodb-temp-data-file-path=ibtmp1:12M:autoextend:max:1000M', '--default-tmp-storage-engine=MyISAM']
     restart: unless-stopped
   checklists:
     build:
