@@ -103,7 +103,11 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     public function _initDatabase ()
     {
         $config = Zend_Registry::get('config');
-        $db = Zend_Db::factory($config->database);
+        // credentials come from the container environment, not config.ini
+        $dbConfig = $config->database->toArray();
+        $dbConfig['params']['username'] = getenv('DATABASE_USER');
+        $dbConfig['params']['password'] = getenv('DATABASE_PASSWORD');
+        $db = Zend_Db::factory(new Zend_Config($dbConfig));
         Zend_Db_Table_Abstract::setDefaultAdapter($db);
         $db->setFetchMode(Zend_Db::FETCH_ASSOC);
         Zend_Registry::set('db', $db);

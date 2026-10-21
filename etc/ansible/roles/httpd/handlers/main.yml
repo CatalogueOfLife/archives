@@ -1,8 +1,0 @@
----
-- name: Restart Apache2
-  command: /etc/init.d/apache2 restart
-  become: yes
-  become_user: root
-  become_method: sudo
-  tags: apache
-  

@@ -1,30 +1,24 @@
-FROM ubuntu:18.04
+# PHP 8.4.27 fixes CVE-2026-109618 and CVE-2026-109619 (https://www.php.net/archive/2026.php#2026-10-21-5).
+# Bump the tag and digest together whenever a new 8.4.x security release is published.
+FROM php:8.4.27-apache@sha256:a0b75cee7023ba2c127138dcad2ecc6ec7e09435534645e70450f29f24ea2a5a
 
-ARG DATABASE_PASSWORD
-RUN echo DATABASE_PASSWORD
-RUN echo $DATABASE_PASSWORD
+RUN docker-php-ext-install mysqli \
+ && a2enmod rewrite headers \
+ && a2dissite 000-default \
+ && cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update -y
+COPY etc/php/archives.ini "$PHP_INI_DIR/conf.d/zz-archives.ini"
+COPY etc/apache2/sites-available/archives.conf /etc/apache2/sites-available/archives.conf
+RUN a2ensite archives
 
-# Enable PPA repos
-RUN apt-get install -y software-properties-common
+# Web applications
+COPY var/www/html/annual-checklist/ /var/www/annual-checklist/
 
-# Disable these development tools in production
-# RUN apt-get install -y vim htop nmap wget zsh tmux rsync net-tools iotop mytop
-
-RUN apt-get install -y python3-minimal python3-pip python-mysqldb libmysqlclient-dev mysql-client apt-transport-https php-common libapache2-mod-php7.2 php7.2-cli php7.2-common php7.2-curl php7.2-gd php7.2-json php7.2-mbstring php7.2-mysql php7.2-opcache php7.2-readline php7.2-xml php7.2-zip libapache2-mod-php7.2 php-gettext php7.2-curl php7.2-gd php7.2-mysql
-RUN apt-add-repository -y --update ppa:ansible/ansible
-
-RUN mkdir -p /var/log/apache2
-
-# Copy web applications
-COPY var/www/html/annual-checklist/ /usr/lib/apache2/htdocs/annual-checklist
-
-# Provision image with ansible-playbook
-RUN apt-get install -y ansible
-COPY etc/ansible/ /etc/ansible
-RUN cd /etc/ansible; ansible-playbook --extra-vars "DATABASE_PASSWORD=$DATABASE_PASSWORD" httpd.yml
+# Zend apps (2010+) write their logs into application/log
+RUN for y in 2010 2011 2012 2013 2014 2015 2016 2017 2018 2019; do \
+      mkdir -p /var/www/annual-checklist/$y/application/log; \
+    done \
+ && chown -R root:root /var/www/annual-checklist \
+ && chown -R www-data:www-data /var/www/annual-checklist/20*/application/log
 
 EXPOSE 80
-ENTRYPOINT ['/usr/sbin/apachectl', '-D', 'FOREGROUND']

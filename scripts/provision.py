@@ -1,40 +1,48 @@
 import os
+import subprocess
+import sys
 
-# Get database password
-DATABASE_PASSWORD = os.environ.get('DATABASE_PASSWORD')
+# Usage: provision.py              create databases, import all dumps, create the read-only user
+#        provision.py --users-only  only (re)create the read-only user on an existing database
+
+DATABASE_PASSWORD = os.environ['DATABASE_PASSWORD']
+DATABASE_RO_PASSWORD = os.environ.get('DATABASE_RO_PASSWORD')
+
+# dump file per database, newest first
+DUMPS = [(f'col{y}ac', f'mysql_col{y}ac.sql.zst') for y in range(2019, 2011, -1)] + [
+    ('col2011ac', 'mysql_baseschema_2011_v19.sql.zst')] + [
+    (f'col{y}ac', f'mysql_col{y}ac.sql.zst') for y in range(2010, 2004, -1)]
+
+# password via the environment, not the command line
+ENV = dict(os.environ, MYSQL_PWD=DATABASE_PASSWORD)
+
+
+def mysql(db, stdin):
+    subprocess.run(['mysql', '-hdatabase', '-uroot', db], stdin=stdin, env=ENV, check=True)
+
+
+def create_ro_user():
+    if not DATABASE_RO_PASSWORD:
+        sys.exit('DATABASE_RO_PASSWORD is not set')
+    print('Creating read-only user col_ro...')
+    pw = DATABASE_RO_PASSWORD.replace("'", "''")
+    sql = f"CREATE USER IF NOT EXISTS 'col_ro'@'%' IDENTIFIED BY '{pw}';\n" \
+          f"ALTER USER 'col_ro'@'%' IDENTIFIED BY '{pw}';\n"
+    sql += ''.join(f"GRANT SELECT, EXECUTE ON `{db}`.* TO 'col_ro'@'%';\n" for db, _ in DUMPS)
+    subprocess.run(['mysql', '-hdatabase', '-uroot'], input=sql.encode(), env=ENV, check=True)
+
 
 # Wait for database
-os.system('sleep 10')
+subprocess.run(['sh', '-c', 'until mysqladmin ping -hdatabase -uroot --silent; do sleep 2; done'], env=ENV)
 
-print("Creating databases...")
-os.system('cd /home/col/data; cat provision.sql | mysql -hdatabase -uroot -p' + DATABASE_PASSWORD + ' col')
-print("Importing AC2019...")
-os.system('cd /home/col/data; zstdcat mysql_col2019ac.sql.zst | mysql -hdatabase -uroot -p' + DATABASE_PASSWORD + ' col2019ac')
-print("Importing AC2018...")
-os.system('cd /home/col/data; zstdcat mysql_col2018ac.sql.zst | mysql -hdatabase -uroot -p' + DATABASE_PASSWORD + ' col2018ac')
-print("Importing AC2017...")
-os.system('cd /home/col/data; zstdcat mysql_col2017ac.sql.zst | mysql -hdatabase -uroot -p' + DATABASE_PASSWORD + ' col2017ac')
-print("Importing AC2016...")
-os.system('cd /home/col/data; zstdcat mysql_col2016ac.sql.zst | mysql -hdatabase -uroot -p' + DATABASE_PASSWORD + ' col2016ac')
-print("Importing AC2015...")
-os.system('cd /home/col/data; zstdcat mysql_col2015ac.sql.zst | mysql -hdatabase -uroot -p' + DATABASE_PASSWORD + ' col2015ac')
-print("Importing AC2014...")
-os.system('cd /home/col/data; zstdcat mysql_col2014ac.sql.zst | mysql -hdatabase -uroot -p' + DATABASE_PASSWORD + ' col2014ac')
-print("Importing AC2013...")
-os.system('cd /home/col/data; zstdcat mysql_col2013ac.sql.zst | mysql -hdatabase -uroot -p' + DATABASE_PASSWORD + ' col2013ac')
-print("Importing AC2012...")
-os.system('cd /home/col/data; zstdcat mysql_col2012ac.sql.zst | mysql -hdatabase -uroot -p' + DATABASE_PASSWORD + ' col2012ac')
-print("Importing AC2011...")
-os.system('cd /home/col/data; zstdcat mysql_baseschema_2011_v19.sql.zst | mysql -hdatabase -uroot -p' + DATABASE_PASSWORD + ' col2011ac')
-print("Importing AC2010...")
-os.system('cd /home/col/data; zstdcat mysql_col2010ac.sql.zst | mysql -hdatabase -uroot -p' + DATABASE_PASSWORD + ' col2010ac')
-print("Importing AC2009...")
-os.system('cd /home/col/data; zstdcat mysql_col2009ac.sql.zst | mysql -hdatabase -uroot -p' + DATABASE_PASSWORD + ' col2009ac')
-print("Importing AC2008...")
-os.system('cd /home/col/data; zstdcat mysql_col2008ac.sql.zst | mysql -hdatabase -uroot -p' + DATABASE_PASSWORD + ' col2008ac')
-print("Importing AC2007...")
-os.system('cd /home/col/data; zstdcat mysql_col2007ac.sql.zst | mysql -hdatabase -uroot -p' + DATABASE_PASSWORD + ' col2007ac')
-print("Importing AC2006...")
-os.system('cd /home/col/data; zstdcat mysql_col2006ac.sql.zst | mysql -hdatabase -uroot -p' + DATABASE_PASSWORD + ' col2006ac')
-print("Importing AC2005...")
-os.system('cd /home/col/data; zstdcat mysql_col2005ac.sql.zst | mysql -hdatabase -uroot -p' + DATABASE_PASSWORD + ' col2005ac')
+if '--users-only' not in sys.argv:
+    print('Creating databases...')
+    with open('/home/col/data/provision.sql', 'rb') as f:
+        mysql('col', f)
+    for db, dump in DUMPS:
+        print(f'Importing {db}...')
+        zstd = subprocess.Popen(['zstdcat', f'/home/col/data/{dump}'], stdout=subprocess.PIPE)
+        mysql(db, zstd.stdout)
+        zstd.wait()
+
+create_ro_user()
