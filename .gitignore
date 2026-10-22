@@ -2,3 +2,4 @@
 data/*.gz
 data/*.zstd
 var/lib/
+data/*.zst

@@ -2,9 +2,21 @@
 
 ## Installation
 
-1. Copy the database dumps into the data directory.
+1. Download the MySQL dumps into the data directory.
 
-(GBIF has a copy on NFS at `col/archives`.)
+The dumps for 2005-2019 are published as `<year>_mysql.sql.gz` at https://download.checklistbank.org/col/annual/
+(the server needs cookies, so use a browser or `wget`/`curl` with a cookie jar):
+
+```
+cd data
+for y in 2005 2006 2007 2008 2009 2010 2012 2013 2014 2015 2016 2017 2018 2019; do
+  curl -fL -c .cookies -b .cookies -O https://download.checklistbank.org/col/annual/${y}_mysql.sql.gz
+done
+```
+
+2011 is the exception: the public `2011_mysql.sql.gz` has the old pre-2011 schema without the `_search_*` tables the
+2011 app needs. Copy `mysql_baseschema_2011_v19.sql.zst` from GBIF's NFS (`/mnt/auto/col/archives`) instead.
+The older `mysql_col<year>ac.sql.zst` dumps from the same place also work in place of the `.gz` files.
 
 2. Provisioning the database will take a few hours, but it only needs to be done once with the commands:
 

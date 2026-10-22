@@ -8,10 +8,13 @@ import sys
 DATABASE_PASSWORD = os.environ['DATABASE_PASSWORD']
 DATABASE_RO_PASSWORD = os.environ.get('DATABASE_RO_PASSWORD')
 
-# dump file per database, newest first
-DUMPS = [(f'col{y}ac', f'mysql_col{y}ac.sql.zst') for y in range(2019, 2011, -1)] + [
-    ('col2011ac', 'mysql_baseschema_2011_v19.sql.zst')] + [
-    (f'col{y}ac', f'mysql_col{y}ac.sql.zst') for y in range(2010, 2004, -1)]
+# candidate dump files per database, newest first; the first one present in data/ is imported.
+# <year>_mysql.sql.gz are the public dumps from https://download.checklistbank.org/col/annual/.
+# The public 2011 dump has the pre-2011 schema, the 2011 app needs the base schema dump kept by GBIF.
+DUMPS = [(f'col{y}ac', [f'{y}_mysql.sql.gz', f'mysql_col{y}ac.sql.zst']) for y in range(2019, 2011, -1)] + [
+    ('col2011ac', ['mysql_baseschema_2011_v19.sql.zst', 'mysql_baseschema_2011_v19.sql.gz'])] + [
+    (f'col{y}ac', [f'{y}_mysql.sql.gz', f'mysql_col{y}ac.sql.zst']) for y in range(2010, 2004, -1)]
+DATA = '/home/col/data'
 
 # password via the environment, not the command line
 ENV = dict(os.environ, MYSQL_PWD=DATABASE_PASSWORD)
@@ -37,12 +40,17 @@ subprocess.run(['sh', '-c', 'until mysqladmin ping -hdatabase -uroot --silent; d
 
 if '--users-only' not in sys.argv:
     print('Creating databases...')
-    with open('/home/col/data/provision.sql', 'rb') as f:
+    with open(f'{DATA}/provision.sql', 'rb') as f:
         mysql('col', f)
-    for db, dump in DUMPS:
-        print(f'Importing {db}...')
-        zstd = subprocess.Popen(['zstdcat', f'/home/col/data/{dump}'], stdout=subprocess.PIPE)
-        mysql(db, zstd.stdout)
-        zstd.wait()
+    missing = [names[0] for _, names in DUMPS if not any(os.path.exists(f'{DATA}/{n}') for n in names)]
+    if missing:
+        sys.exit('Missing dumps in data/: ' + ', '.join(missing))
+    for db, names in DUMPS:
+        dump = next(f'{DATA}/{n}' for n in names if os.path.exists(f'{DATA}/{n}'))
+        print(f'Importing {dump} into {db}...')
+        unpack = subprocess.Popen(['zstdcat' if dump.endswith('.zst') else 'zcat', dump], stdout=subprocess.PIPE)
+        mysql(db, unpack.stdout)
+        if unpack.wait():
+            sys.exit(f'Could not unpack {dump}')
 
 create_ro_user()
