@@ -58,7 +58,8 @@ class ACI_Model_Webservice extends AModel
         try {
             $this->_process($this->_validate($request));
         } catch(Zend_Db_Exception $e) {
-            $this->_setError('Database query failed: '.$e);
+            error_log('Webservice: ' . $e);
+            $this->_setError('Database query failed');
         } catch (ACI_Model_Webservice_Exception $e) {
             $this->_setError($e->getMessage());
         }
@@ -183,7 +184,7 @@ class ACI_Model_Webservice extends AModel
             $this->_responseLimits[$request->getParam('response')], // LIMIT
             $request->getParam('start') // OFFSET
         );
-        $numRows = count($res);
+        $numRows = legacy_count($res);
         if ($numRows == 0) {
             throw new ACI_Model_Webservice_Exception('No names found');
         }

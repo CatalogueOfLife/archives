@@ -223,7 +223,7 @@ class ACI_Helper_Renderer extends Zend_Controller_Action_Helper_Abstract
     {
         $config = Zend_Registry::get('config');
         return htmlspecialchars(
-            $str, ENT_NOQUOTES, $config->resources->view->encoding, false
+            (string) $str, ENT_QUOTES, $config->resources->view->encoding, false
         );
     }
 }

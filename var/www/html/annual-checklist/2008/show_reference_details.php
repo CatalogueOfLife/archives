@@ -61,7 +61,7 @@
 		$$variable = trim(stripslashes(urldecode($$variable))) ;
 	}
 	
-	$record_id = ($record_id)-0 ;
+	$record_id = (int) ($record_id) ;
 	
 	if ($reference_type == "scientific name" && $record_id == 0) {
 		die ("<p>Error: missing or invalid record id</p>") ;

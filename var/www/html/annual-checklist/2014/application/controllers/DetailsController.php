@@ -24,7 +24,7 @@ class DetailsController extends AController
     public function init ()
     {
         parent::init();
-        $this->view->key = $this->_getParam('key');
+        $this->view->key = $this->view->escape((string) $this->_getParam('key'));
         $this->view->contentClass = 'details';
     }
 
@@ -50,14 +50,14 @@ class DetailsController extends AController
             foreach ($ids as $id) {
                 $references[] = $detailsModel->getReferenceById($id);
             }
-            $preface = $this->getHelper('DataFormatter')->getReferencesLabel(count($ids));
+            $preface = $this->getHelper('DataFormatter')->getReferencesLabel(legacy_count($ids));
         }
         elseif ($speciesId) {
             $taxa = $detailsModel->getScientificName($speciesId);
             if ($taxa instanceof ACI_Model_Table_Taxa) {
                 $references = $detailsModel->getReferencesByTaxonId(
                     $taxa->id);
-                $numReferences = count($references);
+                $numReferences = legacy_count($references);
                 $preface = $this->getHelper('DataFormatter')->getReferencesLabel(
                     $numReferences, $taxa->name);
             }
@@ -67,7 +67,7 @@ class DetailsController extends AController
             if ($taxa instanceof ACI_Model_Table_Taxa) {
                 $references = $detailsModel->getReferencesBySynonymId(
                     $taxa->id);
-                $numReferences = count($references);
+                $numReferences = legacy_count($references);
                 $preface = $this->getHelper('DataFormatter')->getReferencesLabel(
                     $numReferences, $taxa->taxaFullName);
             }
@@ -160,7 +160,7 @@ class DetailsController extends AController
 	        }
 	    }
         $this->view->hasTransliterations = $this->_hasTransliterations($speciesDetails->commonNames);
-        $this->view->regionsCount = count($regions);
+        $this->view->regionsCount = legacy_count($regions);
         $this->view->regions = implode(',',$regions);
     }
 

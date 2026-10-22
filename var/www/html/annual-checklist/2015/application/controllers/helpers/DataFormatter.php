@@ -299,7 +299,7 @@ class ACI_Helper_DataFormatter extends Zend_Controller_Action_Helper_Abstract
         }
         $speciesDetails->headTitle = $speciesDetails->taxaStatus ?
             strip_tags($speciesDetails->taxaFullName) : $name . ' ' . $speciesDetails->author;
-        $numRefs = count($speciesDetails->references);
+        $numRefs = legacy_count($speciesDetails->references);
         $speciesDetails->referencesLabel = $numRefs ?
             $this->getReferencesLabel(
                 $numRefs, strip_tags($speciesDetails->name)
@@ -562,7 +562,7 @@ class ACI_Helper_DataFormatter extends Zend_Controller_Action_Helper_Abstract
     {
         $translator = Zend_Registry::get('Zend_Translate');
         $previous = false;
-        $total = count($input);
+        $total = legacy_count($input);
         $phyla = $totals = $c1 = $c2 = array();
         for ($i = 0; $i < $total; $i++) {
             $current = $input[$i]['kingdom'];
@@ -936,7 +936,7 @@ class ACI_Helper_DataFormatter extends Zend_Controller_Action_Helper_Abstract
 
     protected function _addCnRegion ($speciesDetails)
     {
-        $total = count($speciesDetails->commonNames);
+        $total = legacy_count($speciesDetails->commonNames);
         for ($i = 0; $i < $total; $i++) {
             $cn = $speciesDetails->commonNames[$i];
             if (!empty($cn['country']) && !empty($cn['region'])) {

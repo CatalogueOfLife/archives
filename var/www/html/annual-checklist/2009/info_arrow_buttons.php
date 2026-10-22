@@ -22,7 +22,7 @@
 	  9 => "Acknowledgements") ;
 
 	$current_url = explode("/",$_SERVER['PHP_SELF']) ;
-	$current_page = $current_url[count($current_url)-1] ;
+	$current_page = $current_url[legacy_count($current_url)-1] ;
 	$info_page_number = array_search ($current_page,$info_pages) ;
 	echo "<br><div align=center>\n" ;
 	if ($info_page_number > 1 ) {
@@ -31,7 +31,7 @@
 		echo "<img src='images/blank.gif' width='8' height='1' border='0'>" ;
 	}
 	echo "<select name='select_page' onchange='document.location.href=this.options[this.selectedIndex].value'>" ;
-	for ($i = 1; $i < count($info_pages_names)+1; $i++){
+	for ($i = 1; $i < legacy_count($info_pages_names)+1; $i++){
 		if ($i == $info_page_number) {
 			echo "<option selected" ;
 		} else {
@@ -41,7 +41,7 @@
 	}
 	echo "</select>" ;
 	
-	if ($info_page_number < count($info_pages)) {
+	if ($info_page_number < legacy_count($info_pages)) {
 		$next_page = $info_page_number+1 ;
 		echo "<img src='images/blank.gif' width='8' height='1' border='0'>" ;
 		echo "<input type='button' name='goNext' class='formbutton' value=' Next >> ' onClick=\"JavaScript: document.location.href='$info_pages[$next_page]'\">" ;

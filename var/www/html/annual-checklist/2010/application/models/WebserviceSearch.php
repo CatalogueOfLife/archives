@@ -229,7 +229,7 @@ class ACI_Model_WebserviceSearch extends AModel
         do {
             $select->bind(array($id));
             $res = $select->query()->fetchAll();
-            if (!count($res)) {
+            if (!legacy_count($res)) {
                 break;
             }
             if ($res[0] > 0) {

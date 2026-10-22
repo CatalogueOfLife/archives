@@ -26,7 +26,7 @@ $paginator = $this->paginationControl(
 <div class="results_counter" align="right">
 <?php echo $this->translate('Records_found'); ?>:
 <?php echo number_format($this->paginator->getTotalItemCount()); ?>
-<?php if ($this->fuzzy && (count($this->data) > 0)): ?>
+<?php if ($this->fuzzy && (legacy_count($this->data) > 0)): ?>
     &nbsp;&nbsp;-&nbsp;&nbsp;<?php echo $this->translate('Names_suggestions'); ?>
 <?php endif; ?>
 <?php if ($this->paginator instanceof Eti_Paginator) : ?>
@@ -51,7 +51,7 @@ $paginator = $this->paginationControl(
     <?php echo $this->translate('Export_search_results'); ?>
 </a> |
 <?php endif;?>
-<?php if (count($this->data) > 0): ?>
+<?php if (legacy_count($this->data) > 0): ?>
 <a href="<?php echo $this->form->getAction(); ?>">
     <?php echo $this->translate('New_search'); ?>
 </a>

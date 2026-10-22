@@ -240,7 +240,7 @@ class ACI_Helper_Renderer extends Zend_Controller_Action_Helper_Abstract
     {
         $config = Zend_Registry::get('config');
         return htmlspecialchars(
-            $str, ENT_NOQUOTES, $config->resources->view->encoding, false
+            (string) $str, ENT_QUOTES, $config->resources->view->encoding, false
         );
     }
     
@@ -249,7 +249,7 @@ class ACI_Helper_Renderer extends Zend_Controller_Action_Helper_Abstract
     public function insertIntoArray(&$arr1, $key, $arr2) {
         $index = array_search($key, array_keys($arr1));
         if ($index === false) {
-            $index = count($arr1); // insert @ end of array if $key not found
+            $index = legacy_count($arr1); // insert @ end of array if $key not found
         }
         $end = array_splice($arr1, $index++);
         $arr1 = array_merge($arr1, $arr2, $end);

@@ -55,10 +55,10 @@ class ACI_Model_Info extends AModel
             )
         )
         ->order(
-            array($sortOrder . ' ' . strtoupper($direction))
+            array($sortOrder . ' ' . (strtolower((string) $direction) == 'desc' ? 'DESC' : 'ASC'))
         );
         $res = $select->query()->fetchAll();
-        $total = count($res);
+        $total = legacy_count($res);
         $this->_logger->debug("$total source databases");
         return $res;
     }

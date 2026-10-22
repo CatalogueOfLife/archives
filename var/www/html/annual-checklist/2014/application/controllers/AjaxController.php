@@ -65,6 +65,10 @@ class AjaxController extends AController
 
     public function imagesAction ()
     {
+        // module.images_ajax is off in every edition: don't query the (dead) image services
+        if (!$this->_moduleEnabled('images_ajax')) {
+            throw new Zend_Controller_Action_Exception('Images module disabled', 404);
+        }
         $this->_setSpecies();
         if (!empty($this->_errors)) {
             $this->_response->setBody($this->_createErrorJson());
@@ -147,7 +151,7 @@ class AjaxController extends AController
     public function queryWebservices ($channels = array())
     {
         $mh = curl_multi_init();
-        for ($i = 0; $i < count($channels); $i++) {
+        for ($i = 0; $i < legacy_count($channels); $i++) {
             $ch[$i] = curl_init();
             $url = sprintf($channels[$i]['url'], urlencode($this->_species));
             if (strstr($url, '[key]') !== false) {
@@ -166,7 +170,7 @@ class AjaxController extends AController
         } while ($running);
         
         // Place results in results array and close handlers
-        for ($i = 0; $i < count($channels); $i++) {
+        for ($i = 0; $i < legacy_count($channels); $i++) {
             $this->_remoteData[$channels[$i]['channel']] = curl_multi_getcontent($ch[$i]);
             curl_multi_remove_handle($mh, $ch[$i]);
         }
@@ -205,7 +209,7 @@ class AjaxController extends AController
         $remoteData = $this->_remoteData['YahooImages'];
         if (isset($remoteData) && !empty($remoteData)) {
             $channelResult = (object) $this->_emptyImageChannelResult;
-            $data = unserialize($remoteData);
+            $data = unserialize($remoteData, array('allowed_classes' => false));
             if (!empty($data['ResultSet']['Result'])) {
                 // Only a single result is required
                 $data = $data['ResultSet']['Result'][0];
@@ -232,7 +236,7 @@ class AjaxController extends AController
 
     private function _createJsonOutput ()
     {
-        $this->_jsonOutput['numberOfResults'] = count($this->_jsonChannelResults);
+        $this->_jsonOutput['numberOfResults'] = legacy_count($this->_jsonChannelResults);
         $this->_jsonOutput['results'] = $this->_jsonChannelResults;
         return Zend_Json::encode($this->_jsonOutput);
     }

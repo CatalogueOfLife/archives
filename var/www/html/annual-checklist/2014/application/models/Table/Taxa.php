@@ -238,12 +238,12 @@ class ACI_Model_Table_Taxa
 	
 	public function hasSynonyms ()
     {
-        return (bool) count($this->synonyms);
+        return (bool) legacy_count($this->synonyms);
     }
 
     public function hasCommonNames ()
     {
-        return (bool) count($this->commonNames);
+        return (bool) legacy_count($this->commonNames);
     }
 
     public function __get ($name)

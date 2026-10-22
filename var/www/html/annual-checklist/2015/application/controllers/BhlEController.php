@@ -13,10 +13,17 @@ require_once 'AController.php';
  */
 class BhlEController extends AController {
 
+    public function preDispatch()
+    {
+        if (!$this->_moduleEnabled('bhl')) {
+            throw new Zend_Controller_Action_Exception('BHL module disabled', 404);
+        }
+    }
+
     public function indexAction() {
         $genus = $this->_request->getParam('genus');
         $species = $this->_request->getParam('species');
-        $searchTerm = "{$genus}%20{$species}";
+        $searchTerm = urlencode((string) $genus) . "%20" . urlencode((string) $species);
         $this->view->searchTerm = $searchTerm;
         $this->view->bhl = $this->_getBHLResponse($searchTerm);
         $this->view->portalUrlPattern = Bootstrap::instance()->getOption('bhl.portal_urlpattern');
@@ -30,7 +37,7 @@ class BhlEController extends AController {
         $this->_response->setHeader('Content-Type', 'text/plain', true);
         $genus = $this->_request->getParam('genus');
         $species = $this->_request->getParam('species');    
-        $searchTerm = "{$genus}%20{$species}";
+        $searchTerm = urlencode((string) $genus) . "%20" . urlencode((string) $species);
         $response = $this->_getBHLResponse($searchTerm);
         $this->_response->setBody($response->numFound);
         $this->_response->sendResponse();

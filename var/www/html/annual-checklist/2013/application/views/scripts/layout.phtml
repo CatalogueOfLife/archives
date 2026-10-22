@@ -136,7 +136,7 @@ dojo.require("dojo.parser");
     <div id="header">
         <h1 class="title"><?php printf($this->translate('title'), $this->app->edition); ?></h1>
     </div>
-    <?php if(count($this->interfaceLanguages) > 1): ?>
+    <?php if(legacy_count($this->interfaceLanguages) > 1): ?>
         <div id="languagebar">
         <ul>
         <?php foreach ($this->interfaceLanguages as $iso => $language): ?> 
@@ -237,7 +237,7 @@ dojo.require("dojo.parser");
                 <?php echo $this->translate('Acknowledgments'); ?></a></li>
             </ul>
           </li>
-<!--      <?php if(count($this->interfaceLanguages) > 1): ?>
+<!--      <?php if(legacy_count($this->interfaceLanguages) > 1): ?>
             <li class="">
             <a href="javascript:void(0);">
             <img

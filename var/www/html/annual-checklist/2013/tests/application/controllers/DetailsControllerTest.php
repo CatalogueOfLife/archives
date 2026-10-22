@@ -116,7 +116,7 @@ class DetailsControllerTest extends Zend_Test_PHPUnit_ControllerTestCase
         $this->assertController('details');
         $this->assertAction('reference');
         //match number of references
-        $numRefs = count($taxa->references);
+        $numRefs = legacy_count($taxa->references);
         $this->assertQueryCount('table.details-table', $numRefs);
         //Species name in preface
         $this->assertQueryContentContains(

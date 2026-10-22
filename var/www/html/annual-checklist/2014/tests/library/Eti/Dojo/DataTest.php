@@ -32,7 +32,7 @@ class Eti_Dojo_DataTest extends PHPUnit_Framework_TestCase
             'data' => 'item data'
         );
         $this->_etiDojoData->addItem($item);
-        $this->assertEquals(count($this->_etiDojoData), 1);
+        $this->assertEquals(legacy_count($this->_etiDojoData), 1);
         $this->assertEquals(
             $this->_etiDojoData->getItem(
                 $item[$this->_etiDojoData->getIdentifier()]
@@ -71,7 +71,7 @@ class Eti_Dojo_DataTest extends PHPUnit_Framework_TestCase
         );
         $this->_etiDojoData->addItem($item);
         $this->assertEquals(
-            count($this->_etiDojoData),
+            legacy_count($this->_etiDojoData),
             0,
             "Items with null identifier must not be added!"
         );

@@ -73,7 +73,7 @@ class Eti_Db_Select extends Zend_Db_Select
             );
         }
 
-        if (count($this->_parts[self::UNION])) {
+        if (legacy_count($this->_parts[self::UNION])) {
             require_once 'Zend/Db/Select/Exception.php';
             throw new Zend_Db_Select_Exception(
                 "Invalid use of table with " . self::SQL_UNION

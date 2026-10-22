@@ -39,7 +39,7 @@ class Eti_Validate_AlphaNumStringLength extends Zend_Validate_StringLength
             $this->_error(self::TOO_LONG);
         }
         
-        if (count($this->_messages)) {
+        if (legacy_count($this->_messages)) {
             return false;
         } else {
             return true;

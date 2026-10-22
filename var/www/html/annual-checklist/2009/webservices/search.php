@@ -25,11 +25,11 @@
 	}
 	if (isset($_GET["id"])) {
 		$id = $_GET["id"] ;
-		$id = $id - 0 ;
+		$id = (int) $id ;
 	}
 	if (isset($_GET["start"])) {
 		$start = $_GET["start"] ;
-		$start = $start - 0 ;
+		$start = (int) $start ;
 	}
 	if ($format == "") {
 		$format = "xml" ;

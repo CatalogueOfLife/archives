@@ -168,7 +168,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     public function getOption ($key)
     {
         $chunks = explode('.', $key);
-        if (count($chunks) === 1) {
+        if (legacy_count($chunks) === 1) {
             return parent::getOption($key);
         }
         $options = parent::getOptions();
@@ -197,7 +197,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         $cookieExpiration = $config->advanced->cookie_expiration;
         $currentLanguage = self::DEFAULT_LANGUAGE;
         // Language has already been set in cookie
-        if (isset($_COOKIE['aci_language'])) {
+        if (isset($_COOKIE['aci_language']) && is_string($_COOKIE['aci_language']) &&
+            preg_match('/^[a-z]{2}$/', $_COOKIE['aci_language'])) {
             if (file_exists(APPLICATION_PATH . '/data/languages/lang.' . $_COOKIE['aci_language'] . '.ini')) {
                 return $_COOKIE['aci_language'];
             }

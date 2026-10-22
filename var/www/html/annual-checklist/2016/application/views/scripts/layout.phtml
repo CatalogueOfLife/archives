@@ -129,7 +129,7 @@ dojo.require("dojo.parser");
     <div id="header">
         <span class="title"><?php printf($this->translate('title'), $this->app->edition); ?></span>
     </div>
-    <?php if(count($this->interfaceLanguages) > 1): ?>
+    <?php if(legacy_count($this->interfaceLanguages) > 1): ?>
         <div id="languagebar">
         <ul>
         <?php foreach ($this->interfaceLanguages as $iso => $language): ?>

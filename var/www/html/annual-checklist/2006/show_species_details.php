@@ -44,7 +44,7 @@ header("Content-Type: text/html; charset=iso-8859-1");
 	
 	$record_id = 0 ;
 	if (isset($_REQUEST["record_id"])) {
-		$record_id = ($_REQUEST["record_id"])-0 ;
+		$record_id = (int) ($_REQUEST["record_id"]) ;
 	}
 	
 		
@@ -107,7 +107,7 @@ header("Content-Type: text/html; charset=iso-8859-1");
 		$result = mysql_query($query) or die("Error: MySQL query failed");
 		$row = mysql_fetch_row($result);
 		mysql_free_result($result) ;
-		$record_id = ($row[0])-0 ;
+		$record_id = (int) ($row[0]) ;
 	} else {
 		$is_synonym = "no" ;
 	}
@@ -226,7 +226,7 @@ header("Content-Type: text/html; charset=iso-8859-1");
 		
 		if ($parents != "") {
 			$parents = explode(",", $parents);
-			for ($i = 0; $i < count($parents); $i++) {
+			for ($i = 0; $i < legacy_count($parents); $i++) {
 				$parent_id = $parents[$i] ;
 				$query = "SELECT `taxon`,`name_with_italics`,`parent_id` FROM `taxa` WHERE `record_id` = '$parent_id'" ;
 				$result = mysql_query($query) or die("Error: MySQL query failed");

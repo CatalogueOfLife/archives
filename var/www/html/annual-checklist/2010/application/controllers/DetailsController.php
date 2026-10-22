@@ -18,7 +18,7 @@ class DetailsController extends AController
     public function init()
     {
         parent::init();
-        $this->view->key = $this->_getParam('key');
+        $this->view->key = $this->view->escape((string) $this->_getParam('key'));
         $this->view->contentClass = 'details';
     }
     
@@ -44,13 +44,13 @@ class DetailsController extends AController
                 $references[] = $detailsModel->getReferenceById($id);
             }
             $preface = $this->getHelper('DataFormatter')
-                ->getReferencesLabel(count($ids));
+                ->getReferencesLabel(legacy_count($ids));
         } elseif ($speciesId) {
             $taxa = $detailsModel->getScientificName($speciesId);
             if ($taxa instanceof ACI_Model_Table_Taxa && $taxa->nameCode) {
                 $references =
                    $detailsModel->getReferencesByNameCode($taxa->nameCode);
-                $numReferences = count($references);
+                $numReferences = legacy_count($references);
                 $preface = $this->getHelper('DataFormatter')
                    ->getReferencesLabel($numReferences, $taxa->name);
             }

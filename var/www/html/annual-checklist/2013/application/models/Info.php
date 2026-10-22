@@ -47,11 +47,11 @@ class ACI_Model_Info extends AModel
         ->order(
             array(
                 'dsdd.' . $this->getRightColumnName($order) . ' ' .
-                    strtoupper($direction)
+                    (strtolower((string) $direction) == 'desc' ? 'DESC' : 'ASC')
             )
         );
         $res = $select->query()->fetchAll();
-        $total = count($res);
+        $total = legacy_count($res);
         $this->_logger->debug("$total source databases");
         return $res;
     }

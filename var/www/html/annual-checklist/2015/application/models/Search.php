@@ -447,6 +447,8 @@ class ACI_Model_Search extends AModel
 
     protected function _selectDistributionsByIds($regionIds, $regionStandard)
     {
+        // comes straight from the request and is put into IN (...): integers only
+        $regionIds = implode(',', array_map('intval', explode(',', (string) $regionIds)));
         $select = new Zend_Db_Select($this->_db);
 
         $select->from(
@@ -706,7 +708,7 @@ class ACI_Model_Search extends AModel
         $select->group(array('tst.id'));
         if(isset($having)) {
             $select->having(
-                'COUNT(tst.id) >= ' . count($name_elements) . $having
+                'COUNT(tst.id) >= ' . legacy_count($name_elements) . $having
             );
         }
         $select->order(array('`name`', '`status`'));
@@ -799,7 +801,7 @@ class ACI_Model_Search extends AModel
         $select->group(array('tst.id'));
         if(isset($having)) {
             $select->having(
-                'COUNT(tst.id) >= ' . count($name_elements) . $having
+                'COUNT(tst.id) >= ' . legacy_count($name_elements) . $having
             );
         }
         $select->order(array('name'));
@@ -867,6 +869,17 @@ class ACI_Model_Search extends AModel
      */
     public function fetchTaxaByRank($rank, $query, array $key)
     {
+        // $rank and the keys of $key are used as column names and $query is
+        // put into double-quoted SQL strings: allow known ranks only and
+        // strip the characters that could end such a string
+        $ranks = array('kingdom', 'phylum', 'class', 'order', 'superfamily',
+            'family', 'genus', 'subgenus', 'species', 'infraspecies');
+        if (!in_array($rank, $ranks, true)) {
+            return array('error' => true);
+        }
+        $key = array_intersect_key($key, array_flip($ranks));
+        $query = str_replace(array('"', '\\'), '', (string) $query);
+
         $cleanStr = trim(str_replace('*', '', $query));
         $cacheKey = $rank . '_' . $cleanStr . '_' . implode('_', $key);
         $res = $this->_fetchFromCache($cacheKey);
@@ -1119,7 +1132,7 @@ class ACI_Model_Search extends AModel
             )
         );
         $res = $select->query()->fetchAll();
-        $total = count($res);
+        $total = legacy_count($res);
         $this->_logger->debug("$total children of $parentId");
         return $res;
     }

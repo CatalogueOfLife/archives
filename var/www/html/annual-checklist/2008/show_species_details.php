@@ -43,7 +43,7 @@
 	
 	$record_id = 0 ;
 	if (isset($_REQUEST["record_id"])) {
-		$record_id = ($_REQUEST["record_id"])-0 ;
+		$record_id = (int) ($_REQUEST["record_id"]) ;
 	}
 	
 		
@@ -110,7 +110,7 @@
 		$result = mysql_query($query) or die("Error: MySQL query failed");
 		$row = mysql_fetch_row($result);
 		mysql_free_result($result) ;
-		$record_id = ($row[0])-0 ;
+		$record_id = (int) ($row[0]) ;
 	} else {
 		$is_synonym = "no" ;
 	}
@@ -233,7 +233,7 @@
 			$classification .= "<table cellspacing=\"0\" cellpadding=\"0\">";
 			$firstcol="";
 			$secondcol="";
-			for ($i = 0; $i < count($parents); $i++) {
+			for ($i = 0; $i < legacy_count($parents); $i++) {
 				$parent_id = $parents[$i] ;
 				$query = "SELECT `taxon`,`name_with_italics`,`LSID` FROM `taxa` WHERE `record_id` = '$parent_id'" ;
 				$result = mysql_query($query) or die("Error: MySQL query failed");

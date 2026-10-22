@@ -96,9 +96,7 @@ class ACI_Model_WebserviceSearch extends AModel
     	        }
             }
         	if (!empty($rank)) {
-                $select->where(
-	                'tst.`rank` = "' . $rank . '"'
-	            );
+                $select->where('tst.`rank` = ?', $rank);
 	        }
 	        $select->order(
 	            self::_getDefaultSortExpression($searchKey)
@@ -111,7 +109,7 @@ class ACI_Model_WebserviceSearch extends AModel
         $select->group(array('record_id'));
         if (isset($having)) {
             $select->having(
-                'COUNT(tst.id) >= ' . count($name_elements) . $having
+                'COUNT(tst.id) >= ' . legacy_count($name_elements) . $having
             );
         }
         $select->limit($limit, $offset);
@@ -231,7 +229,7 @@ class ACI_Model_WebserviceSearch extends AModel
         do {
             $select->bind(array($id));
             $res = $select->query()->fetchAll();
-            if (!count($res)) {
+            if (!legacy_count($res)) {
                 break;
             }
             if ($res[0] > 0) {

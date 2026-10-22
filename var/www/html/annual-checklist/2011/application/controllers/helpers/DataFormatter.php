@@ -248,7 +248,7 @@ class ACI_Helper_DataFormatter extends Zend_Controller_Action_Helper_Abstract
                     break;
             }
         }
-        $numRefs = count($speciesDetails->references);
+        $numRefs = legacy_count($speciesDetails->references);
         $speciesDetails->referencesLabel = $numRefs ?
             $this->getReferencesLabel(
                 $numRefs, strip_tags($speciesDetails->name)

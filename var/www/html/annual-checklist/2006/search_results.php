@@ -96,11 +96,11 @@ function startAtRecord (thisPage) {
 	} else if ($match_whole_words != "on" && $match_whole_words  != "off") {
 		die("<p>Error: invalid parameter value. Match whole words must be on or off.</p>") ;
 	}
-	$sort_by_column = $sort_by_column-0 ;
-	$number_of_records_shown_per_page = $number_of_records_shown_per_page-0 ;
-	$first_record_shown = $first_record_shown-0 ;
-	$number_of_records_found = $number_of_records_found-0 ;
-	$number_of_records_to_show = $number_of_records_to_show-0 ;
+	$sort_by_column = (int) $sort_by_column ;
+	$number_of_records_shown_per_page = (int) $number_of_records_shown_per_page ;
+	$first_record_shown = (int) $first_record_shown ;
+	$number_of_records_found = (int) $number_of_records_found ;
+	$number_of_records_to_show = (int) $number_of_records_to_show ;
 	
 	if ($sort_by_column == 0) {
 		$sort_by_column = 1 ;

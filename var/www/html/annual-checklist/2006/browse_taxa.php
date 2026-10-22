@@ -103,7 +103,7 @@ header("Content-Type: text/html; charset=iso-8859-1");
 		$blank = "<img src=\"images/tree/blank.gif\" border=\"0\">";
 		$vertline = "<img src=\"images/tree/vertline.gif\" border=\"0\">";
 		//	test for root node (parenttaxon = none equals level = 0)
-		if (count($parents) == 0 || $level == 0) {
+		if (legacy_count($parents) == 0 || $level == 0) {
 			$parent_id = 0 ;
 			$level = 0 ;
 		} else {

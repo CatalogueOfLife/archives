@@ -24,7 +24,7 @@ class DetailsController extends AController
     public function init ()
     {
         parent::init();
-        $this->view->key = $this->_getParam('key');
+        $this->view->key = $this->view->escape((string) $this->_getParam('key'));
         $this->view->contentClass = 'details';
     }
 
@@ -50,14 +50,14 @@ class DetailsController extends AController
             foreach ($ids as $id) {
                 $references[] = $detailsModel->getReferenceById($id);
             }
-            $preface = $this->getHelper('DataFormatter')->getReferencesLabel(count($ids));
+            $preface = $this->getHelper('DataFormatter')->getReferencesLabel(legacy_count($ids));
         }
         elseif ($speciesId) {
             $taxa = $detailsModel->getScientificName($speciesId);
             if ($taxa instanceof ACI_Model_Table_Taxa) {
                 $references = $detailsModel->getReferencesByTaxonId(
                     $taxa->id);
-                $numReferences = count($references);
+                $numReferences = legacy_count($references);
                 $preface = $this->getHelper('DataFormatter')->getReferencesLabel(
                     $numReferences, $taxa->name);
             }
@@ -67,7 +67,7 @@ class DetailsController extends AController
             if ($taxa instanceof ACI_Model_Table_Taxa) {
                 $references = $detailsModel->getReferencesBySynonymId(
                     $taxa->id);
-                $numReferences = count($references);
+                $numReferences = legacy_count($references);
                 $preface = $this->getHelper('DataFormatter')->getReferencesLabel(
                     $numReferences, $taxa->taxaFullName);
             }
@@ -139,7 +139,7 @@ class DetailsController extends AController
         $this->_logger->debug($speciesDetails);
         $this->view->jsTranslation = $this->_createJsTranslationArray($this->_jsTreeTranslation);
         $this->view->species = $speciesDetails;
-        $this->view->naturalKey = $this->_getParam('id');
+        $this->view->naturalKey = $this->view->escape((string) $this->_getParam('id'));
         $this->view->source = $source;
         $this->view->creditsModuleEnabled = $this->_moduleEnabled('credits');
         $this->view->indicatorsModuleEnabled = $this->_moduleEnabled('indicators');
@@ -168,7 +168,7 @@ class DetailsController extends AController
 	    if (isset($speciesDetails->commonNames) && !empty($speciesDetails->commonNames)) {
             $this->view->hasTransliterations = $this->_hasTransliterations($speciesDetails->commonNames);
 	    }
-	    $this->view->regionsCount = count($regions);
+	    $this->view->regionsCount = legacy_count($regions);
         $this->view->regions = implode(',',$regions);
         $translator = Zend_Registry::get('Zend_Translate');
         if (isset($speciesDetails->status) && !empty($speciesDetails->status)) {

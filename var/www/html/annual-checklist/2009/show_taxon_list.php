@@ -42,7 +42,7 @@
 		$list_output .= "<table border='0' cellspacing='0' cellpadding='0'>\n" ;
 		
 		if ($selected_letter == "") {
-			$number_of_names = count($list_of_names) ;
+			$number_of_names = legacy_count($list_of_names) ;
 			for ($i = 0; $i < $number_of_names ; $i++) {
 				$found_name = $list_of_names[$i] ;
 				$counter = $i + 1 ;

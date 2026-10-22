@@ -4,7 +4,7 @@
 <?php
 
 	$current_url = explode("/",$_SERVER['PHP_SELF']) ;
-	$current_file_name = $current_url[count($current_url)-1] ;
+	$current_file_name = $current_url[legacy_count($current_url)-1] ;
 	
 	function getLinkNames() {
 		return array(
@@ -84,7 +84,7 @@
 					($thisMenuItem == 2 && substr($current_file_name,0,6) == "search") || 
 					($thisMenuItem == 3 && substr($current_file_name,0,4) == "info") ) {
 			$current_url = explode("/",$_SERVER['PHP_SELF']) ;
-			$current_file_name = $current_url[count($current_url)-1] ;
+			$current_file_name = $current_url[legacy_count($current_url)-1] ;
 			echo "<span class='menuselected' onMouseUp=\"document.location.href='$link_url'\">$link_name</span>" ;
 		} else {
 			echo "<span class='menumain' onMouseUp=\"document.location.href='$link_url'\">$link_name</span>" ;
@@ -97,7 +97,7 @@
 		$link_urls = getLinkUrls();
 		$link_name = $link_urls[$thisMenuItem] ;
 		$current_url = explode("/",$_SERVER['PHP_SELF']) ;
-		$current_file_name = $current_url[count($current_url)-1] ;
+		$current_file_name = $current_url[legacy_count($current_url)-1] ;
 		if ($link_name != $current_file_name) {
 			echo "<a style='cursor: default;' href='$link_name'>$icon</a>" ;
 		} else {

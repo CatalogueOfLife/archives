@@ -134,9 +134,9 @@ class SearchController extends AController
             	$temp = $regionModel->getRegion($regionId);
             	$regions[] = $temp['name'];
             }
-            if(count($regions) > 5) {
+            if(legacy_count($regions) > 5) {
             	$regions = $regions[0].', '.$regions[1].', '.$regions[2].', '.$regions[3].' '.
-            	str_replace('%s',(count($regions) - 4),$this->view->translate('and_x_other_regions'));
+            	str_replace('%s',(legacy_count($regions) - 4),$this->view->translate('and_x_other_regions'));
             } else {
 	            $regions = implode(', ',$regions);
             }

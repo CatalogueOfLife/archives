@@ -30,6 +30,9 @@ class ACI_Helper_Fuzzy extends Zend_Controller_Action_Helper_Abstract
      */
     public function getMatches ($searchtext)
     { 
+        // the parts of $searchtext are put into single-quoted SQL strings below;
+        // scientific names never contain quotes or backslashes
+        $searchtext = str_replace(array("'", '"', '\\'), '', (string) $searchtext);
         $searchresult = array();
         $sort1 = $sort2 = array();
         $lev = array();
@@ -197,7 +200,7 @@ class ACI_Helper_Fuzzy extends Zend_Controller_Action_Helper_Abstract
             }
 
             // If there's more than one hit, sort them (faster here than within the db)
-            if (count($searchresult) > 1) {
+            if (legacy_count($searchresult) > 1) {
                 foreach ($searchresult as $key => $row) {
                     $sort[$key] = $row['taxon'];
                 }
@@ -253,7 +256,7 @@ class ACI_Helper_Fuzzy extends Zend_Controller_Action_Helper_Abstract
             }
 
             // If there's more than one hit, sort them (faster here than within the db)
-            if (count($lev) > 1) {
+            if (legacy_count($lev) > 1) {
                 foreach ($lev as $key => $row) {
                     $sort[$key] = $row['taxon'];
                 }
@@ -325,7 +328,7 @@ class ACI_Helper_Fuzzy extends Zend_Controller_Action_Helper_Abstract
             }            
             
             // If there's more than one hit, sort them (faster here than within the db)
-            if (count($searchresult) > 1) {
+            if (legacy_count($searchresult) > 1) {
                 foreach ($searchresult as $key => $row) {
                     $sort[$key] = $row['ratio'];
                 }
@@ -354,7 +357,7 @@ class ACI_Helper_Fuzzy extends Zend_Controller_Action_Helper_Abstract
 
         $taxon = ' ' . trim($taxon);
         $atoms = $this->_atomizeString($taxon, ' ');
-        $maxatoms = count($atoms);
+        $maxatoms = legacy_count($atoms);
         $pos = 0;
 
         // Check for any noise at the beginning of the taxon

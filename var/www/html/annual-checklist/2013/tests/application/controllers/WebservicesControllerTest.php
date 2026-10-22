@@ -139,7 +139,7 @@ class WebservicesControllerTest extends Zend_Test_PHPUnit_ControllerTestCase
         $this->dispatch('/webservice/?id=0&start=' . $start);
         $xml = simplexml_load_string($this->getResponse()->getBody());
         $results = $xml->xpath("//results");
-        $this->assertEquals(count($results), 1);
+        $this->assertEquals(legacy_count($results), 1);
         $this->assertTrue($results[0] instanceof SimpleXMLElement);
         $numRes = $results[0]['total_number_of_results'] - $start;
         $this->assertXpath("//results[@start = '" . $start . "']");
