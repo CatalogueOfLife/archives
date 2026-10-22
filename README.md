@@ -15,8 +15,16 @@ done
 ```
 
 2011 is the exception: the public `2011_mysql.sql.gz` has the old pre-2011 schema without the `_search_*` tables the
-2011 app needs. Copy `mysql_baseschema_2011_v19.sql.zst` from GBIF's NFS (`/mnt/auto/col/archives`) instead.
-The older `mysql_col<year>ac.sql.zst` dumps from the same place also work in place of the `.gz` files.
+2011 app needs, and the dump the app was built for (`mysql_baseschema_2011_v19.sql.gz` or `.zst`) is not published.
+On an existing installation it is already in the `col2011ac` database (`var/lib/mysql`); export it from there
+before setting up a new machine:
+
+```
+docker-compose exec -T database sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysqldump -uroot --routines col2011ac' \
+  | gzip > data/mysql_baseschema_2011_v19.sql.gz
+```
+
+Dumps named like the earlier deployments (`mysql_col<year>ac.sql.gz` or `.zst`) are accepted too.
 
 2. Provisioning the database will take a few hours, but it only needs to be done once with the commands:
 

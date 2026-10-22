@@ -10,10 +10,10 @@ DATABASE_RO_PASSWORD = os.environ.get('DATABASE_RO_PASSWORD')
 
 # candidate dump files per database, newest first; the first one present in data/ is imported.
 # <year>_mysql.sql.gz are the public dumps from https://download.checklistbank.org/col/annual/.
-# The public 2011 dump has the pre-2011 schema, the 2011 app needs the base schema dump kept by GBIF.
-DUMPS = [(f'col{y}ac', [f'{y}_mysql.sql.gz', f'mysql_col{y}ac.sql.zst']) for y in range(2019, 2011, -1)] + [
+# The public 2011 dump has the pre-2011 schema; the 2011 app needs the unpublished base schema dump.
+DUMPS = [(f'col{y}ac', [f'{y}_mysql.sql.gz', f'mysql_col{y}ac.sql.gz', f'mysql_col{y}ac.sql.zst']) for y in range(2019, 2011, -1)] + [
     ('col2011ac', ['mysql_baseschema_2011_v19.sql.zst', 'mysql_baseschema_2011_v19.sql.gz'])] + [
-    (f'col{y}ac', [f'{y}_mysql.sql.gz', f'mysql_col{y}ac.sql.zst']) for y in range(2010, 2004, -1)]
+    (f'col{y}ac', [f'{y}_mysql.sql.gz', f'mysql_col{y}ac.sql.gz', f'mysql_col{y}ac.sql.zst']) for y in range(2010, 2004, -1)]
 DATA = '/home/col/data'
 
 # password via the environment, not the command line
