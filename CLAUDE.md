@@ -23,7 +23,7 @@ docker-compose logs checklists | grep -E 'PHP (Fatal|Warning)|Uncaught'
 docker run --rm -v "$PWD/var/www/html":/src -w /src php:8.4.27-apache php -l annual-checklist/2019/application/models/Search.php
 ```
 
-The SQL dumps are not in git: `<year>_mysql.sql.gz` from https://download.checklistbank.org/col/annual/ (public, behind a cookie challenge), except 2011, whose public dump has the wrong (pre-2011) schema; it needs `mysql_baseschema_2011_v19.sql.gz`/`.zst`, which is not published (export `col2011ac` from an existing installation's database). `provision.py` imports whichever candidate file it finds in `data/`, also accepting the earlier `mysql_col<year>ac.sql.gz`/`.zst` names. Without them the apps can only be tested against the partial schemas in `<year>/application/data/db/` (2005–2009 work with the 2011 `schema.sql`; the 2011+ Zend apps need `_search_*` tables that only the dumps have).
+The SQL dumps (`data/mysql_col<year>ac.sql.zst`, plus `mysql_baseschema_2011_v19.sql.zst` for 2011) are not in git; download them from https://download.checklistbank.org/col/annual/ac_mysql/ (behind a cookie challenge; `MD5SUMS` alongside). Without them the apps can only be tested against the partial schemas in `<year>/application/data/db/` (2005–2009 work with the 2011 `schema.sql`; the 2011+ Zend apps need `_search_*` tables that only the dumps have).
 
 ## Architecture
 

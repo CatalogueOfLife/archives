@@ -4,27 +4,18 @@
 
 1. Download the MySQL dumps into the data directory.
 
-The dumps for 2005-2019 are published as `<year>_mysql.sql.gz` at https://download.checklistbank.org/col/annual/
-(the server needs cookies, so use a browser or `wget`/`curl` with a cookie jar):
+The original dumps are published at https://download.checklistbank.org/col/annual/ac_mysql/ (the server needs
+cookies, so use a browser or `curl` with a cookie jar). Only the `col<year>ac` dumps and the 2011 base schema are
+needed:
 
 ```
 cd data
-for y in 2005 2006 2007 2008 2009 2010 2012 2013 2014 2015 2016 2017 2018 2019; do
-  curl -fL -c .cookies -b .cookies -O https://download.checklistbank.org/col/annual/${y}_mysql.sql.gz
+u=https://download.checklistbank.org/col/annual/ac_mysql
+for f in mysql_baseschema_2011_v19 $(for y in 2005 2006 2007 2008 2009 2010 2012 2013 2014 2015 2016 2017 2018 2019; do echo mysql_col${y}ac; done); do
+  curl -fL -c .cookies -b .cookies -O $u/$f.sql.zst
 done
+curl -fsL -c .cookies -b .cookies $u/MD5SUMS | md5sum -c --ignore-missing
 ```
-
-2011 is the exception: the public `2011_mysql.sql.gz` has the old pre-2011 schema without the `_search_*` tables the
-2011 app needs, and the dump the app was built for (`mysql_baseschema_2011_v19.sql.gz` or `.zst`) is not published.
-On an existing installation it is already in the `col2011ac` database (`var/lib/mysql`); export it from there
-before setting up a new machine:
-
-```
-docker-compose exec -T database sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysqldump -uroot --routines col2011ac' \
-  | gzip > data/mysql_baseschema_2011_v19.sql.gz
-```
-
-Dumps named like the earlier deployments (`mysql_col<year>ac.sql.gz` or `.zst`) are accepted too.
 
 2. Provisioning the database will take a few hours, but it only needs to be done once with the commands:
 
