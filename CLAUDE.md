@@ -4,30 +4,39 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A frozen, read-only re-hosting of the legacy Catalogue of Life **Annual Checklist** web apps for 2005–2019, served at `archives.catalogueoflife.org/annual-checklist/<year>`. Each year is the original PHP application as shipped back then, kept alive on a single Ubuntu 18.04 / PHP 7.2 / MySQL 5.7 stack via Docker Compose. This is not where current CoL work happens (that's `backend` / `portal`); changes here are about keeping old code running, not adding features. There is no build tooling, linter or test suite.
+A frozen, read-only re-hosting of the legacy Catalogue of Life **Annual Checklist** web apps for 2005–2019, served at `archives.catalogueoflife.org/annual-checklist/<year>`. Each year is the original PHP application as shipped back then, kept alive on PHP 8.4 (official `php:8.4.27-apache` image) and MySQL 5.7 via Docker Compose. This is not where current CoL work happens (that's `backend` / `portal`); changes here are about keeping old code running safely, not adding features. There is no build tooling, linter or unit test suite; `scripts/smoke.sh` is the end-to-end check.
 
 ## Commands
 
 ```sh
-# one-off: generate the DB root password (read by docker-compose and baked into the httpd image)
-echo DATABASE_PASSWORD=$(< /dev/urandom tr -dc _A-Za-z0-9- | head -c20) > .env
+# one-off: MySQL root password + password of the read-only app user col_ro
+echo DATABASE_PASSWORD=... > .env; echo DATABASE_RO_PASSWORD=... >> .env
 
-docker-compose up -d database      # MySQL 5.7, host port 3399, data persisted in ./var/lib/mysql
-docker-compose run provision       # create the 15 DBs and import all dumps (takes hours; once only)
-docker-compose up checklists       # Apache + PHP on port 80
-docker-compose build checklists    # required after ANY change under var/www/html or etc/ansible
+docker-compose up -d database             # MySQL 5.7, no host port, data persisted in ./var/lib/mysql
+docker-compose run provision              # create the 15 DBs, import all dumps (takes hours; once), create col_ro
+docker-compose run provision --users-only # only (re)create col_ro on an existing database
+docker-compose up -d --build checklists   # Apache + PHP on port 80; rebuild after ANY change (code is copied into the image)
+scripts/smoke.sh [base-url]               # every page must answer without 5xx; EXPECT=1 also checks known species pages
+docker-compose logs checklists | grep -E 'PHP (Fatal|Warning)|Uncaught'
+
+# lint with the production PHP
+docker run --rm -v "$PWD/var/www/html":/src -w /src php:8.4.27-apache php -l annual-checklist/2019/application/models/Search.php
 ```
 
-The SQL dumps (`data/mysql_col<year>ac.sql.zst`, plus `mysql_baseschema_2011_v19.sql.zst` for 2011) are not in git; GBIF keeps a copy on NFS at `col/archives`. Prebuilt images exist as `docker.gbif.org/col/archives-provision` and `docker.gbif.org/col/archives-checklists` in case the build breaks (e.g. Ubuntu 18.04 apt mirrors or the ansible PPA disappearing).
+The SQL dumps (`data/mysql_col<year>ac.sql.zst`, plus `mysql_baseschema_2011_v19.sql.zst` for 2011) are not in git; GBIF keeps a copy on NFS at `col/archives`. Without them the apps can only be tested against the partial schemas in `<year>/application/data/db/` (2005–2009 work with the 2011 `schema.sql`; the 2011+ Zend apps need `_search_*` tables that only the dumps have).
 
 ## Architecture
 
 **Three compose services** (`docker-compose.yaml`):
-- `database` — MySQL 5.7 with deliberately legacy settings (`utf8`, MyISAM default engine, empty `sql-mode`, `mysql_native_password`, capped InnoDB temp file). The old apps depend on the lax SQL mode; don't "fix" these flags.
-- `provision` — runs `scripts/provision.py`: applies `data/provision.sql` (creates `col2005ac` … `col2019ac`) then `zstdcat | mysql` each dump into its DB. Adding a year means editing both files.
-- `checklists` — built from `docker/httpd.Dockerfile`. The PHP code is **copied into the image** at `/usr/lib/apache2/htdocs/annual-checklist` (the bind mount for `var/www/html` is commented out), so edits to app code need a rebuild. `etc/apache2` and `var/log` *are* bind-mounted, so Apache config changes only need a restart.
+- `database` — MySQL 5.7 with deliberately legacy settings (`utf8`, MyISAM default engine, empty `sql-mode`, `mysql_native_password`). The old apps depend on the lax SQL mode; don't "fix" these flags. MySQL 8 is not a drop-in replacement (`rank` became a reserved word and is used unquoted); MariaDB 11.4 is the likelier successor.
+- `provision` — `scripts/provision.py`: applies `data/provision.sql` (creates `col2005ac` … `col2019ac`), pipes each dump into its DB, then creates `col_ro` (SELECT, EXECUTE). Adding a year means editing both files.
+- `checklists` — `docker/httpd.Dockerfile`, pinned by tag and digest; bump both for each PHP security release. Copies `annual-checklist/` to `/var/www/annual-checklist`, the shared `lib/` to `/var/www/lib`, `etc/php/archives.ini` into conf.d and the single vhost `etc/apache2/sites-available/archives.conf`.
 
-**DB credentials are injected at image build time by Ansible**, not read from the environment at runtime. `etc/ansible/roles/httpd/tasks/main.yml` runs inside the Dockerfile and uses `lineinfile` regexes to overwrite the password line in each year's config file, creates the `application/log` dirs for 2010+, and chowns everything to `daemon`. Password values committed in the per-year config files are therefore overwritten on build; if you change the structure of one of those config lines, update the matching regex in the Ansible task or the password will silently stop being set. DB host is always `database`, user `root`, DB name `col<year>ac`.
+**DB credentials come from the environment at runtime** (`DATABASE_USER`, `DATABASE_PASSWORD`, passed through by `PassEnv` in the vhost): `getenv()` in 2005 `connect_to_database.php`, 2006–2008 `ac_config.php`, 2009 `includes/config.php`, and in each Zend app's `Bootstrap::_initDatabase` (which overrides the blank `database.params.*` in `config.ini`). DB host is always `database`, DB name `col<year>ac`. Never commit credentials.
+
+**Shared code in `var/www/html/lib/`** (served from `/var/www/lib`, outside every alias):
+- `Zend/` — zf1-future 1.25.2 (PHP 8 compatible ZF1), replacing the per-year vendored ZF 1.9.5/1.12. Each Zend app's `public/index.php` puts it on the include_path before its own `library/` (which now only holds `Eti/`).
+- `compat.php` — auto-prepended to every request (`auto_prepend_file`). Defines `legacy_count()` (PHP 7 `count()` semantics; the apps' simple `count($x)` calls were rewritten to it) and, for 2005–2009 requests only, a **request filter** that fully url-decodes every GET/POST/REQUEST/COOKIE value, strips `\ " < >` and control chars, and turns `'` into `_`. That filter *is* the SQL-injection/XSS fix for the procedural apps, whose queries interpolate request values into quoted SQL strings. Don't remove it or narrow its scope without patching those queries individually. Superglobals must be named literally there (`$_REQUEST` is JIT-initialised).
 
 **Two generations of PHP app** under `var/www/html/annual-checklist/<year>/`:
 
@@ -36,15 +45,16 @@ The SQL dumps (`data/mysql_col<year>ac.sql.zst`, plus `mysql_baseschema_2011_v19
 | 2005 | flat procedural PHP, `ext/mysql` calls | `connect_to_database.php` | year dir |
 | 2006–2008 | same, plus autocomplete | `ac_config.php` | year dir |
 | 2009 | same, config moved | `includes/config.php` | year dir |
-| 2010–2019 | Zend Framework 1 MVC (`application/`, `library/Zend`, `library/Eti`) | `application/configs/config.ini` (`[production]`) | `public/` (front controller `index.php` via `.htaccess` rewrite) |
+| 2010–2019 | Zend Framework 1 MVC "ACI" (`application/`, `library/Eti`) | `application/configs/config.ini` (`[production]`) + `application.xml` | `public/` (front controller `index.php` via `.htaccess` rewrite) |
 
-The pre-2010 apps were written for `ext/mysql`, which PHP 7 removed; each ships `lib/mysql.php` (the `php7-mysql-shim` mapping `mysql_*` onto `mysqli`), included from `connect_to_database.php`. Any new PHP-7 breakage in these apps should be shimmed rather than rewritten.
+The pre-2010 apps use `lib/mysql.php` (php7-mysql-shim, patched for PHP 8 and with `mysqli_report(MYSQLI_REPORT_OFF)` so `or die()` paths still work); all five copies are identical, so change one and copy it. 2006–2009 share near-identical files, so fixes port across with small rebases. The Zend apps fall into four generations (2010; 2011–12; 2013–14; 2015–19); one patch usually applies to every year via the same method names (`fetchTaxaByRank`, `wildcardHandling`, `_selectDistributionsByIds`, `Renderer::escape`).
 
-**Apache routing** — `etc/apache2/sites-available/19-col2019ac.conf` (the `sites-enabled` copy is a plain file, not a symlink: keep both identical). One vhost for `archives.catalogueoflife.org` / `*.catalogueoflife.org`, with an `Alias /annual-checklist/<year>` per year pointing at `public/` for 2010+ and at the year root for 2005–2009. Each ZF app's `public/.htaccess` has a `RewriteBase /annual-checklist/<year>` that must match its alias. `etc/apache2/apache2.conf` uses `ServerRoot /usr/lib/apache2` and loads `libphp7.2.so` directly.
+**Apache routing** — one vhost for `archives.catalogueoflife.org` / `*.catalogueoflife.org` with an empty `DocumentRoot` and an `Alias /annual-checklist/<year>` per year pointing at `public/` for 2010+ and at the year root for 2005–2009. Each Zend app's `public/.htaccess` `RewriteBase` must match its alias. The vhost denies config/backup/text files and `2009/includes`, and sets CSP (`'unsafe-inline'`/`'unsafe-eval'` are needed by the old inline JS and Dojo 1.3).
 
 ## Gotchas
 
-- The per-year config files in git (all 2009–2019 configs, plus 2006–2008 `ac_config.php`) still contain password strings, which the build replaces. Don't add new credentials anywhere in the repo; set them through `DATABASE_PASSWORD` and the Ansible task.
-- `docker-compose.yaml` mounts `./ansible`, which doesn't exist; it's harmless.
-- `httpd.Dockerfile` echoes the build-arg password and the Ansible task prints it via `debug`, so build logs contain the password.
-- The repo is about 21k files, most of them images and vendored Zend/Eti libraries per year. Scope searches to a specific year or to `etc/`, `docker/` and `scripts/`.
+- Search security fixes must not rely on PHP alone: in 2005–2009 any new code that reads request values gets them already filtered (see `compat.php`); in the Zend apps bind values (`where('x = ?', $v)`) and whitelist anything used as a column name or sort direction.
+- The 2005 search pages keep the generated SQL in the session (`2005/lib/query_store.php`) and only send a key to the browser; the classification autocomplete (2006–2009) builds its query server-side from form values. Never accept SQL from the client again.
+- Modules `bhl`, `images_ajax` and `map_*` are off in every `config.ini`; their controllers return 404 while off.
+- Files mix CRLF and LF line endings and ISO-8859-1/UTF-8 encodings; edit byte-preserving.
+- The repo has ~14k files, mostly images. Scope searches to a specific year or to `etc/`, `docker/`, `scripts/` and `var/www/html/lib/compat.php`.

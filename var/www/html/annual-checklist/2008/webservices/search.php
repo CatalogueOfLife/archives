@@ -56,7 +56,7 @@
 			$error = "Both name and ID are given. Give either a name or an ID." ;
 		} else if ($name != "" && strlen(str_replace("%","",$search_string)) < 3 ) {
 			$error = "Invalid name given. The name given must consist of at least 3 characters, not counting wildcards (*)" ;
-		} else if ($id != floor(abs($id)) ) {
+		} else if ($id !== "" && $id != floor(abs((int) $id)) ) {
 			$error = "Invalid ID given. The ID must be a positive integer." ;
 		}
 	}

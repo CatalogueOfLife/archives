@@ -57,9 +57,12 @@ if (!function_exists('legacy_clean_request_value')) {
 
     function legacy_clean_request()
     {
-        foreach (array('_GET', '_POST', '_REQUEST', '_COOKIE') as $name) {
-            $GLOBALS[$name] = legacy_clean_request_value($GLOBALS[$name]);
-        }
+        // named literally: $_REQUEST and $_SERVER are only populated (auto_globals_jit)
+        // when they appear in compiled code, never through $GLOBALS['_REQUEST']
+        $_GET = legacy_clean_request_value($_GET);
+        $_POST = legacy_clean_request_value($_POST);
+        $_COOKIE = legacy_clean_request_value($_COOKIE);
+        $_REQUEST = legacy_clean_request_value($_REQUEST);
         // the apps build links from these: no path info, no quotes or tags
         $_SERVER['PHP_SELF'] = $_SERVER['SCRIPT_NAME'];
         if (isset($_SERVER['QUERY_STRING'])) {
