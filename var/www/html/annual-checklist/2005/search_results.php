@@ -1,3 +1,4 @@
+<?php require_once 'lib/query_store.php'; ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
@@ -124,7 +125,7 @@ function startAtRecord (thisPage) {
 	
 		//use existing query
 		
-		$search_query = urldecode($_REQUEST["search_query"]) ;
+		$search_query = ac_load_query(urldecode($_REQUEST["search_query"])) ;
 		if (isset($_REQUEST["record_id"])) {
 			$record_id = $_REQUEST["record_id"] ;
 		}
@@ -296,7 +297,7 @@ function startAtRecord (thisPage) {
 		if ($number_of_records_found > 1) {
 			echo "<form name='change_number_of_records_shown_per_page' method='post' action='search_results.php'>\n" ;
 			echo "<input type='hidden' name='search_page' value='" . urlencode($search_page) . "'>\n" ;
-			echo "<input type='hidden' name='search_query' value='" . urlencode($search_query) . "'>\n" ;
+			echo "<input type='hidden' name='search_query' value='" . urlencode(ac_store_query($search_query)) . "'>\n" ;
 			echo "<input type='hidden' name='first_record_shown' value='0'>\n" ;
 			echo "<input type='hidden' name='number_of_records_found' value='$number_of_records_found'>\n" ;
 			echo "<input type='hidden' name='search_kingdom' value='" . urlencode($search_kingdom) . "'>\n" ;
@@ -925,7 +926,7 @@ function startAtRecord (thisPage) {
 			$first_record_of_next_set = $first_record_shown + $number_of_records_shown_per_page ;
 			
 			if ($number_of_records_found > $number_of_records_to_show) {
-				echo "<input type='hidden' name='search_query' value='" . urlencode($search_query) . "'>" ;
+				echo "<input type='hidden' name='search_query' value='" . urlencode(ac_store_query($search_query)) . "'>" ;
 				echo "<input type='hidden' name='first_record_shown' value='$first_record_shown'>" ;
 				echo "<input type='hidden' name='number_of_records_shown_per_page' value='$number_of_records_shown_per_page'>" ;
 				echo "<input type='hidden' name='number_of_records_found' value='$number_of_records_found'>" ;
@@ -976,7 +977,7 @@ function startAtRecord (thisPage) {
   </table>
   <form name="start_at_record" method="post" action="search_results.php">
     <input type="hidden" name="search_page" value="<?php echo urlencode($search_page) ?>">
-    <input type="hidden" name="search_query" value="<?php echo urlencode($search_query) ?>">
+    <input type="hidden" name="search_query" value="<?php echo urlencode(ac_store_query($search_query)) ?>">
     <input type="hidden" name="first_record_shown">
     <input type="hidden" name="number_of_records_shown_per_page" value="<?php echo $number_of_records_shown_per_page ?>">
     <input type="hidden" name="number_of_records_found" value="<?php echo $number_of_records_found ?>">
@@ -1015,7 +1016,7 @@ function startAtRecord (thisPage) {
   <form name="show_species_details" method="post" action="show_species_details.php">
     <input type="hidden" name="record_id">
     <input type="hidden" name="search_page" value="<?php echo urlencode($search_page) ?>">
-    <input type="hidden" name="search_query" value="<?php echo urlencode($search_query) ?>">
+    <input type="hidden" name="search_query" value="<?php echo urlencode(ac_store_query($search_query)) ?>">
     <input type="hidden" name="first_record_shown" value="<?php echo $first_record_shown ?>">
     <input type="hidden" name="number_of_records_shown_per_page" value="<?php echo $number_of_records_shown_per_page ?>">
     <input type="hidden" name="number_of_records_found" value="<?php echo $number_of_records_found ?>">
@@ -1035,7 +1036,7 @@ function startAtRecord (thisPage) {
   <form name="show_common_name" method="post" action="show_common_name_details.php">
     <input type="hidden" name="common_name">
     <input type="hidden" name="search_page" value="<?php echo urlencode($search_page) ?>">
-    <input type="hidden" name="search_query" value="<?php echo urlencode($search_query) ?>">
+    <input type="hidden" name="search_query" value="<?php echo urlencode(ac_store_query($search_query)) ?>">
     <input type="hidden" name="first_record_shown" value="<?php echo $first_record_shown ?>">
     <input type="hidden" name="number_of_records_shown_per_page" value="<?php echo $number_of_records_shown_per_page ?>">
     <input type="hidden" name="number_of_records_found" value="<?php echo $number_of_records_found ?>">

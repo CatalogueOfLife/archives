@@ -24,7 +24,7 @@ header("Content-Type: text/html; charset=iso-8859-1");
 	} else {
 		$search_type = "" ;
 	}
-	$new_search_url = (($search_type == "") ? "search.php" : urldecode($search_type) . ".php") ;
+	$new_search_url = (preg_match("/^[a-z_]+$/", urldecode($search_type)) ? urldecode($search_type) . ".php" : "search.php") ;
 
 	// connect to database
 	include "connect_to_database.php" ;
@@ -43,7 +43,7 @@ header("Content-Type: text/html; charset=iso-8859-1");
 	  FROM `common_names` , 
 	  	   `scientific_names` , 
 		   `databases` 
-	  WHERE `common_names`.`common_name` = '" . addslashes($this_common_name) . "'  
+	  WHERE `common_names`.`common_name` LIKE '" . addslashes($this_common_name) . "'  
 	    AND `common_names`.`name_code` = `scientific_names`.`name_code` 
 		AND `common_names`.`database_id` = `databases`.`record_id` 
 		AND `scientific_names`.`name_code` = `scientific_names`.`accepted_name_code` 
@@ -157,7 +157,7 @@ header("Content-Type: text/html; charset=iso-8859-1");
 
 		$references_query = "SELECT `common_names`.`reference_id`   
 		  FROM `common_names`
-		  WHERE `common_name` = '" . addslashes($this_common_name) . "' 
+		  WHERE `common_name` LIKE '" . addslashes($this_common_name) . "' 
 		    AND `language` = '" . addslashes($language) . "' 
 		    AND `country` = '" . addslashes($country) . "' 
 		    AND `name_code` = '" . addslashes($name_code) . "'" ; 

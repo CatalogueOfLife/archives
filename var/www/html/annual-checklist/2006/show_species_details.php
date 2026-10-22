@@ -55,7 +55,7 @@ header("Content-Type: text/html; charset=iso-8859-1");
 	} else {
 		$search_type = "" ;
 	}
-	$new_search_url = (($search_type == "") ? "search.php" : urldecode($search_type) . ".php") ;
+	$new_search_url = (preg_match("/^[a-z_]+$/", urldecode($search_type)) ? urldecode($search_type) . ".php" : "search.php") ;
 
 	// connect to database
 	

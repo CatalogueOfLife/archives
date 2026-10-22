@@ -274,10 +274,11 @@ function searchNames(input, response,thisTaxon) {
 	}
 	
 	if (query != "") {
-	
-//window.status = query ;
-		query += " LIMIT 0,1" ;
-		var url = "classification_autocomplete.php?q=" + escape(query) ;
+		// the query above only decides whether to ask; the server builds it from these values
+		var url = "classification_autocomplete.php?rank=" + escape(thisTaxon) + "&page=" + escape(page) +
+			"&kingdom=" + escape(kingdom) + "&phylum=" + escape(phylum) + "&tax_class=" + escape(tax_class) +
+			"&order=" + escape(order) + "&superfamily=" + escape(superfamily) + "&family=" + escape(family) +
+			"&genus=" + escape(genus) + "&species=" + escape(species) + "&infraspecies=" + escape(infraspecies) ;
 		loadXMLDoc(url);
 	 }
   }

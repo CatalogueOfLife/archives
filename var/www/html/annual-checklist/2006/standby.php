@@ -87,7 +87,7 @@ MM_reloadPage(true);
   <?php
 	$message = "Please stand by..." ;
 	if ( isset($_REQUEST['msg'])) {
-		$message = urldecode($_REQUEST['msg']) . " " . $message ;
+		$message = htmlspecialchars(urldecode($_REQUEST['msg']), ENT_QUOTES, "ISO-8859-1") . " " . $message ;
 	}
 	echo "<p>$message</p>" ;
 ?>

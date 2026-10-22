@@ -131,7 +131,7 @@ function startAtRecord (thisPage) {
 	$area = str_replace(array("*","?"),"%",$area) ;
 	$search_string = str_replace(array("*","?"),"%",$search_string) ;
 	
-	$new_search_url = (($search_type == "") ? "search.php" : urldecode($search_type) . ".php") ;
+	$new_search_url = (preg_match("/^[a-z_]+$/", urldecode($search_type)) ? urldecode($search_type) . ".php" : "search.php") ;
 	
 	$error = "" ;
 	if ($search_string . $area . $common_name . $kingdom . $phylum . $tax_class . $order . $superfamily . 

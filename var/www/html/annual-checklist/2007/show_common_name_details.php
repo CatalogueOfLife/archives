@@ -22,7 +22,7 @@
 	} else {
 		$search_type = "" ;
 	}
-	$new_search_url = (($search_type == "") ? "search.php" : urldecode($search_type) . ".php") ;
+	$new_search_url = (preg_match("/^[a-z_]+$/", urldecode($search_type)) ? urldecode($search_type) . ".php" : "search.php") ;
 
 	// connect to database
 	include "connect_to_database.php" ;
@@ -41,7 +41,7 @@
 	  FROM `common_names` , 
 	  	   `scientific_names` , 
 		   `databases` 
-	  WHERE `common_names`.`common_name` = '" . addslashes($this_common_name) . "'  
+	  WHERE `common_names`.`common_name` LIKE '" . addslashes($this_common_name) . "'  
 	    AND `common_names`.`name_code` = `scientific_names`.`name_code`  
 	    AND `common_names`.`name_code` LIKE BINARY `scientific_names`.`name_code` 
 		AND `common_names`.`database_id` = `databases`.`record_id` 
@@ -163,7 +163,7 @@
 
 		$references_query = "SELECT `common_names`.`reference_id`   
 		  FROM `common_names`
-		  WHERE `common_name` = '" . addslashes($this_common_name) . "' 
+		  WHERE `common_name` LIKE '" . addslashes($this_common_name) . "' 
 		    AND `language` = '" . addslashes($language) . "' 
 		    AND `country` = '" . addslashes($country) . "' 
 		    AND `name_code` = '" . addslashes($name_code) . "'
