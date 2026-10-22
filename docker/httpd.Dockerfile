@@ -13,6 +13,8 @@ RUN a2ensite archives
 
 # Web applications
 COPY var/www/html/annual-checklist/ /var/www/annual-checklist/
+# zf1-future, shared by the 2010+ apps; outside any served path
+COPY var/www/html/lib/ /var/www/lib/
 
 # Zend apps (2010+) write their logs into application/log
 RUN for y in 2010 2011 2012 2013 2014 2015 2016 2017 2018 2019; do \

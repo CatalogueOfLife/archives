@@ -86,7 +86,7 @@ class ACI_Form_Dojo_Search extends Zend_Dojo_Form
         return true;
     }
     
-    public function render(Zend_View_Interface $view = null)
+    public function render(?Zend_View_Interface $view = null)
     {
         if (null === $view) {
             $view = $this->getView();

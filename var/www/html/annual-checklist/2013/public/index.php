@@ -26,7 +26,12 @@ defined('APPLICATION_ENV')
 set_include_path(
     implode(
         PATH_SEPARATOR,
-        array(realpath(APPLICATION_PATH . '/../library'), get_include_path())
+        array(
+            // shared zf1-future: var/www/html/lib in the repo, /var/www/lib in the image
+            realpath(APPLICATION_PATH . '/../../../lib'),
+            realpath(APPLICATION_PATH . '/../library'),
+            get_include_path()
+        )
     )
 );
 
