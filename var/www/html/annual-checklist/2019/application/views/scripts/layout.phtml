@@ -51,74 +51,13 @@
 ?>
 
 
-<?php if($this->mapModuleEnabled == true || $this->mapInTreeModuleEnabled == true || $this->mapSearchModuleEnabled == true ): ?>
-<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojo/dojo.xd.js"
-        djConfig="parseOnLoad: true">
-dojo.require("dijit.form.Button");
-dojo.require("dijit.Menu");
-</script>
-        <script type="text/javascript">
-            dojo.require("dijit.form.Button");
-            dojo.require("dijit.Menu");
-            dojo.require("dijit.form.CheckBox");
-        </script>
-        <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.6/dijit/themes/tundra/tundra.css"
-        />
-<?php endif; ?>
 
 
 <script type="text/javascript">
 var cookieExpiration = <?php echo (round($this->cookieExpiration/86400)); ?>;
-var mapInTaxonomicTree = <?php if($this->mapInTreeModuleEnabled == true && $this->controller == 'browse' && $this->action == 'tree') echo 1; else echo 0; ?>;
 var baseUrl = "<?php echo $this->baseUrl(); ?>";
 </script>
 
-<?php if(($this->mapModuleEnabled == true || $this->mapInTreeModuleEnabled == true || $this->mapSearchModuleEnabled == true) &&
-	(($this->controller == 'details' && $this->action == 'species') || ($this->controller == 'browse' && $this->action == 'tree')
-	|| ($this->controller == 'search' && $this->action == 'distribution'))): ?>
-<script type="text/javascript">
-<?php if($this->controller == 'browse' && $this->action == 'tree'): ?>
-var mapInTaxonomicTree = <?php if($this->mapInTreeModuleEnabled == true) echo 1; else echo 0; ?>;
-<?php endif; ?>
-var regionStandard = 1;
-var region = Array();
-var polygonSet = Array();
-var baseUrl = "<?php echo $this->baseUrl(); ?>";
-</script>
-<?php if((($this->mapSearchModuleEnabled == true) &&
-	$this->controller == 'search' && $this->action == 'distribution' ) ||
-	(($this->mapInTreeModuleEnabled == true) &&
-	$this->controller == 'browse' && $this->action == 'tree' ) ||
-	(($this->mapInSpeciesDetailEnabled== true) &&
-	$this->controller == 'details' && $this->action == 'species' )): ?>
-<script type="text/javascript" src="<?php echo $this->baseUrl('/scripts/library/ACI/polygons/iho_sea_areas.js');?>"></script>
-<script type="text/javascript" src="<?php echo $this->baseUrl('/scripts/library/ACI/polygons/tdwg_continents_level_1.js');?>"></script>
-<script type="text/javascript" src="<?php echo $this->baseUrl('/scripts/library/ACI/polygons/tdwg_regions_level_4.js');?>"></script>
-<script type="text/javascript" src="<?php echo $this->baseUrl('/scripts/library/ACI/polygons/world_exclusive_economic_zones.js');?>"></script>
-<?php endif; ?>
-<script type="text/javascript" src="<?php echo $this->baseUrl('/scripts/maps.js');?>"></script>
-<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=true"></script>
-<script type="text/javascript">
-dojo.require("dijit.ProgressBar");
-dojo.require("dojo.parser");
-    var map;
-    var mapInfoWindow;
-    function initializeMap() {
-<?php if($this->mapModuleEnabled == true && $this->controller == 'details' &&
-	$this->action == 'species' && $this->regionsCount > 0): ?>
-    	createMap();
-        dojo.addOnLoad(showRegions);
-<?php elseif($this->mapSearchModuleEnabled == true && $this->controller == 'search' &&
-	$this->action == 'distribution'):?>
-		getRegionsInRegionSelect(regionStandard);
-		dojo.addOnLoad(createPolygonsOnMap);
-<?php endif; ?>
-		mapInfoWindow = new google.maps.InfoWindow();
-    }
-
-    google.maps.event.addDomListener(window, 'load', initializeMap);
-</script>
-<?php endif; ?>
 </head>
 <body class="tundra">
     <?php if ('standalone' == APPLICATION_ENV): ?>

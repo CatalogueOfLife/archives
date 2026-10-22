@@ -140,8 +140,6 @@ class DetailsController extends AController
         $this->view->imagesModuleDatabaseEnabled = $this->_moduleEnabled('images_database');
         $this->view->imagesModuleAjaxEnabled = $this->_moduleEnabled(
             'images_ajax');
-        $this->view->mapModuleEnabled = $this->_moduleEnabled(
-            'map_species_details');
         if ($speciesDetails && $this->view->imagesModuleAjaxEnabled) {
             $this->view->dojo()->enable();
             $this->view->ajaxUri = '/ajax/images/name/' . $this->view->species->genus . ' ' .
@@ -151,17 +149,7 @@ class DetailsController extends AController
             }
             $this->view->webserviceTimeoutInMs = $this->_webserviceTimeout * 1000;
         }
-        $this->view->googleMaps = true;
-	    $regions = array();
-	    if($speciesDetails && is_array($speciesDetails->distribution)) {
-	        foreach($speciesDetails->distribution as $dist) {
-	        	if($dist['region_standard'] != 0)
-			        $regions[] = $dist['id'];
-	        }
-	    }
         $this->view->hasTransliterations = $this->_hasTransliterations($speciesDetails->commonNames);
-        $this->view->regionsCount = legacy_count($regions);
-        $this->view->regions = implode(',',$regions);
     }
 
     public function __call ($name, $arguments)

@@ -269,11 +269,7 @@ class ACI_Model_Search extends AModel
         $this->_logger->debug(__METHOD__);
         $this->_logger->debug(func_get_args());
         $searchKey = self::wildcardHandling($searchKey);
-        if($regions != "") {
-	        $distributions = $this->_selectDistributionsByIds($regions, $regionStandard);
-        } else {
-	        $distributions = $this->_selectDistributions($searchKey, $matchWholeWords, $fossil);
-        }
+        $distributions = $this->_selectDistributions($searchKey, $matchWholeWords, $fossil);
         //return $distributions->order(array('name'));
         return $distributions->order(
 	        ($sort ?
@@ -445,69 +441,6 @@ class ACI_Model_Search extends AModel
         return $select;
     }
 
-    protected function _selectDistributionsByIds($regionIds, $regionStandard)
-    {
-        // comes straight from the request and is put into IN (...): integers only
-        $regionIds = implode(',', array_map('intval', explode(',', (string) $regionIds)));
-        $select = new Zend_Db_Select($this->_db);
-
-        $select->from(
-            array('d' => 'distribution'),
-                array(
-                    'distribution' => new Zend_Db_Expr('GROUP_CONCAT(r.name ORDER BY r.name DESC SEPARATOR \', \')'),
-                    'accepted_species_id' => 'd.taxon_detail_id',
-                    'name' => "TRIM(CONCAT(dsd.genus_name " .
-	                    ", ' ', dsd.species_name, ' ', " .
-	                    "IF(dsd.infraspecific_marker = '', '', dsd.infraspecific_marker)," .
-	                    "IF(dsd.infraspecies_name = '', '', dsd.infraspecies_name)))",
-                	'author' => 'dsd.author',
-                	'rank' => 't.taxonomic_rank_id',
-                	'kingdom' => 'dsd.kingdom_name',
-                	'source_database_id' => 'dsd.source_database_id',
-                	'source_database_name' => 'dsd.source_database_short_name',
-                	'status' => 'dsd.status',
-                	'id' => 'd.taxon_detail_id'
-                )
-        )
-        ->joinLeft(
-            array('dsd' => '_species_details'),
-            'dsd.taxon_id = d.taxon_detail_id',
-            array()
-        );
-        if($regionStandard == 4) {
-	        $select->joinLeft(
-	            array('r' => 'region'),
-	            'd.region_id = r.id',
-	            array()
-	        )->joinLeft(
-	            array('r_parent' => 'region'),
-	            'r.parent_id = r_parent.id',
-	            array()
-	        );
-        } else {
-	        $select->joinLeft(
-	            array('r' => 'region'),
-	            'd.region_id = r.id',
-	            array()
-	        );
-        }
-        $select->joinLeft(
-        	array('t' => 'taxon'),
-        	'd.taxon_detail_id = t.id',
-        	array()
-        )
-        ->group(array('d.taxon_detail_id'));
-        if($regionStandard == 4) {
-        	$select->where(
-            	'r_parent.id IN ('.$regionIds.')'
-        	);
-        } else {
-        	$select->where(
-            	'r.id IN ('.$regionIds.')'
-        	);
-        }
-        return $select;
-    }
     /**
      * Returns the fields needed to display the results of the scientific search
      * queries (require a join from sn to sn for synonyms)

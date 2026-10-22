@@ -124,32 +124,8 @@ class SearchController extends AController
             $this->getHelper('Query')->tagLatestQuery();
             $this->_renderResultsPage($form->getInputElements());
 
-        } elseif ($form->isValid($this->_getAllParams()) &&
-            $this->_hasParam('regions') && $this->_getParam('submit', 1)) {
-            //Search by map
-            $regionIds = explode(',',$this->_getParam('regions'));
-            $regionModel = new ACI_Model_Table_Regions($this->_db);
-    		$regions = array();
-            foreach($regionIds as $regionId) {
-            	$temp = $regionModel->getRegion($regionId);
-            	$regions[] = $temp['name'];
-            }
-            if(legacy_count($regions) > 5) {
-            	$regions = $regions[0].', '.$regions[1].', '.$regions[2].', '.$regions[3].' '.
-            	str_replace('%s',(legacy_count($regions) - 4),$this->view->translate('and_x_other_regions'));
-            } else {
-	            $regions = implode(', ',$regions);
-            }
-            $this->view->searchString = $this->view->translate('Search_distribution') . ' - ' . str_replace('%s','"'.$regions.'"',$this->view->translate('Search_results_for'));
-
-            $this->_setSessionFromParams(array('regions'));
-            $this->getHelper('Query')->tagLatestQuery();
-            $this->_renderResultsPage(array('regions'));
-
         } else {
         	//No search
-        	$this->view->mapSearchModuleEnabled = $this->_moduleEnabled(
-            	'map_search');
         	if (!$this->_hasParam('key')) {
                 $this->_setParamsFromSession($form->getInputElements());
             }

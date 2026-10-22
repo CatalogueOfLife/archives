@@ -3,8 +3,7 @@ dojo.provide('ACI.dojo.TxTreeNode');
 function iconHider(panelType, treenode) {
 	if (dojo.byId(panelType + "Panel_" + treenode.item.i.id) && 
     	!dojo.byId("infoPanel_" + treenode.item.i.id + "_dropdown") &&
-    	!dojo.byId("commentPanel_" + treenode.item.i.id + "_dropdown") &&
-    	!dojo.byId("mapPanel_" + treenode.item.i.id + "_dropdown")
+    	!dojo.byId("commentPanel_" + treenode.item.i.id + "_dropdown")
     ) {
     	dojo.style(dojo.byId(panelType + "Panel_" + treenode.item.i.id), "display", "none");
 	}
@@ -18,16 +17,10 @@ dojo.declare('ACI.dojo.TxTreeNode', dijit._TreeNode, {
     	if(showCommentFeedback && dojo.byId("commentPanel_" + this.item.i.id)) {
     		dojo.style(dojo.byId("commentPanel_" + this.item.i.id), "display", "inline-block");
     	}
-    	if(dojo.byId("mapPanel_" + this.item.i.id) &&
-    		this.item.i.type != "" &&
-    		this.item.i.type != "phylum") {
-    		dojo.style(dojo.byId("mapPanel_" + this.item.i.id), "display", "inline-block");
-    	}
     },
     _onMouseLeave:function(evt){
     	iconHider("info", this);
     	iconHider("comment", this);
-    	iconHider("map", this);
     },
     setLabelNode : function(label) {
         if (this.item.root) {
@@ -75,7 +68,6 @@ dojo.declare('ACI.dojo.TxTreeNode', dijit._TreeNode, {
 	        var panel = createInfoPanel(this.item);
 	        var commentPanel = createCommentPanel(this.item);
         }
-        var mapPanel = createMapPanel(this.item);
         
 /*        var commentSpan;
         commentSpan = dojo.doc.createElement('span');
@@ -168,7 +160,6 @@ dojo.declare('ACI.dojo.TxTreeNode', dijit._TreeNode, {
         }
         this.labelNode.appendChild(panel);
         this.labelNode.appendChild(commentPanel);
-        this.labelNode.appendChild(mapPanel);
     },    
     expand : function() {
         this.inherited(arguments);
@@ -243,92 +234,8 @@ function createStatistics(treeNode, bullet, className) {
     return statistics;
 }
 
-function createMapPanel(treeNode) {
-	if(mapInTaxonomicTree == 0 || (treeNode.i.name.indexOf(' ') != -1 && treeNode.i.name != 'Not assigned')) {
-		return dojo.create("span");
-	}
-    var panel = dojo.create("span", {
-        id: "mapPanel" + '_' + treeNode.i.id,
-        className: "mapIcon",
-        title: translate('map_icon_title'),
-        style: "display: none;"
-    });
-    dojo.connect(panel, 'onclick', function(evt) {
-    	showMap(treeNode);
-    });
-	return panel;
-}
 
-function showMap(treeNode){
-	hidePanel(treeNode.i.id);
-    dialog.attr("content", createMapPanelContents(treeNode));
-    dijit.popup.open({ 
-        popup: dialog, 
-        around: dojo.byId("mapPanel_" + treeNode.i.id) 
-    });
-    var dijitToolContainer = document.getElementById("mapPanel_" + treeNode.i.id + '_dropdown').firstElementChild.firstElementChild;
-    dijitToolContainer.className = dijitToolContainer.className + ' dijitMapContainer';
-	createMap();
-    getRegions(treeNode.i.id,treeNode.i.type);
-}
 
-function createMapPanelContents(treeNode) {
-	var table = dojo.doc.createElement('table');
-	table.className = 'panelTable';
-	var tr1 = dojo.doc.createElement('tr');
-	var tr2 = dojo.doc.createElement('tr');
-	var td1 = dojo.doc.createElement('td');
-	var td2 = dojo.doc.createElement('td');
-	
-	tr1.appendChild(td1);
-	tr2.appendChild(td2);
-	table.appendChild(tr1);
-	table.appendChild(tr2);
-	
-	var div = dojo.doc.createElement('div');
-	div.id = 'mapPanel';
-	
-	var divMapProgressBar = dojo.doc.createElement('div');
-	divMapProgressBar.id = 'map_progress_bar';
-	divMapProgressBar.appendChild(dojo.doc.createTextNode(translate('Searching_for_the_regions_please_wait')))
-	
-	var divMap = dojo.doc.createElement('div');
-	divMap.id = 'map_canvas';
-	
-	var closeButton = dojo.doc.createElement('span');
-	dojo.connect(closeButton, 'onclick', function(evt) {
-		closePanel(treeNode.i.id);
-    });
-	//closeButton.href = "javascript:closeInfo(" + treeNode.i.id + ")";
-	closeButton.title = translate('Close_window');
-	closeButton.className = "closeButton";
-	//closeButton.appendChild(dojo.doc.createTextNode('X'));*/
-
-	var rankName = '';
-	if(treeNode.i.rank) {
-		rankName = treeNode.i.rank + ' ';
-	}
-	
-	var rank = dojo.doc.createElement('span');
-	rank.appendChild(dojo.doc.createTextNode(rankName));
-	
-	var scientificName = dojo.doc.createElement('span');
-	scientificName.appendChild(dojo.doc.createTextNode(treeNode.i.name));
-	scientificName.className = 'node-' + treeNode.i.rank;
-	
-	var title = dojo.doc.createElement('span');
-	title.appendChild(rank);
-	title.appendChild(scientificName);
-	title.className = 'commentPanelSection commentPanelTitle';
-	
-	
-	div.appendChild(closeButton);
-	div.appendChild(title);
-	td1.appendChild(divMap);
-	td2.appendChild(divMapProgressBar);
-	div.appendChild(table);
-	return div;
-}
 
 function createInfoPanel(treeNode) {
 	if(treeNode.i.name.indexOf(' ') != -1 && treeNode.i.name != 'Not assigned') {
@@ -438,9 +345,6 @@ function closePanel(currentId){
 	}
 	if (dojo.byId("commentPanel_" + currentId)) {
 		dojo.style(dojo.byId("commentPanel_" + currentId), "display", "none");
-	}
-	if (dojo.byId("mapPanel_" + currentId)) {
-		dojo.style(dojo.byId("mapPanel_" + currentId), "display", "none");
 	}
 	return false;
 }

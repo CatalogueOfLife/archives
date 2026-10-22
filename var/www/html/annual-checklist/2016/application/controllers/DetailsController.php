@@ -134,7 +134,6 @@ class DetailsController extends AController
 		$title = $speciesDetails && $speciesDetails->infra_id != '' ? 'Infraspecies_details' : 'Species_details';
         $this->view->title = $this->view->translate($title);
         $this->view->headTitle('Catalogue of Life : ' . $speciesDetails->headTitle, 'SET');
-        $this->view->mapInSpeciesDetailEnabled = $this->_moduleEnabled('map_species_details');
 
         $this->_logger->debug($speciesDetails);
         $this->view->jsTranslation = $this->_createJsTranslationArray($this->_jsTreeTranslation);
@@ -146,8 +145,6 @@ class DetailsController extends AController
         $this->view->imagesModuleDatabaseEnabled = $this->_moduleEnabled('images_database');
         $this->view->imagesModuleAjaxEnabled = $this->_moduleEnabled(
             'images_ajax');
-        $this->view->mapModuleEnabled = $this->_moduleEnabled(
-            'map_species_details');
         if ($speciesDetails && $this->view->imagesModuleAjaxEnabled) {
             $this->view->dojo()->enable();
             $this->view->ajaxUri = '/ajax/images/name/' . $this->view->species->genus . ' ' .
@@ -157,19 +154,9 @@ class DetailsController extends AController
             }
             $this->view->webserviceTimeoutInMs = $this->_webserviceTimeout * 1000;
         }
-        $this->view->googleMaps = true;
-	    $regions = array();
-	    if($speciesDetails && is_array($speciesDetails->distribution)) {
-	        foreach($speciesDetails->distribution as $dist) {
-	        	if($dist['region_standard'] != 0)
-			        $regions[] = $dist['id'];
-	        }
-	    }
 	    if (isset($speciesDetails->commonNames) && !empty($speciesDetails->commonNames)) {
             $this->view->hasTransliterations = $this->_hasTransliterations($speciesDetails->commonNames);
 	    }
-	    $this->view->regionsCount = legacy_count($regions);
-        $this->view->regions = implode(',',$regions);
         $translator = Zend_Registry::get('Zend_Translate');
         if (isset($speciesDetails->status) && !empty($speciesDetails->status)) {
             switch ($speciesDetails->status) {

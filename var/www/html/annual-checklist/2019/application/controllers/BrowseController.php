@@ -73,7 +73,6 @@ class BrowseController extends AController
             $this->view->showIconsInTreeSelected = $this->_getOrSetCookie('iconSpan');
         }
         // Check if map data should be displayed
-        $this->view->mapInTreeModuleEnabled = $this->_moduleEnabled('map_browse_tree');
 		// Check if statistics and estimations should be displayed
         $statisticsModuleEnabled = $this->_moduleEnabled('statistics');
         $this->view->statisticsModuleEnabled = $statisticsModuleEnabled;

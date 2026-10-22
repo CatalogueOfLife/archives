@@ -28,7 +28,7 @@ The SQL dumps (`data/mysql_col<year>ac.sql.zst`, plus `mysql_baseschema_2011_v19
 ## Architecture
 
 **Three compose services** (`docker-compose.yaml`):
-- `database` — MySQL 5.7 with deliberately legacy settings (`utf8`, MyISAM default engine, empty `sql-mode`, `mysql_native_password`). The old apps depend on the lax SQL mode; don't "fix" these flags. MySQL 8 is not a drop-in replacement (`rank` became a reserved word and is used unquoted); MariaDB 11.4 is the likelier successor.
+- `database` — MySQL 5.7 with deliberately legacy settings (`utf8`, MyISAM default engine, empty `sql-mode`, `mysql_native_password`). The old apps depend on the lax SQL mode; don't "fix" these flags.
 - `provision` — `scripts/provision.py`: applies `data/provision.sql` (creates `col2005ac` … `col2019ac`), pipes each dump into its DB, then creates `col_ro` (SELECT, EXECUTE). Adding a year means editing both files.
 - `checklists` — `docker/httpd.Dockerfile`, pinned by tag and digest; bump both for each PHP security release. Copies `annual-checklist/` to `/var/www/annual-checklist`, the shared `lib/` to `/var/www/lib`, `etc/php/archives.ini` into conf.d and the single vhost `etc/apache2/sites-available/archives.conf`.
 
@@ -55,6 +55,6 @@ The pre-2010 apps use `lib/mysql.php` (php7-mysql-shim, patched for PHP 8 and wi
 
 - Search security fixes must not rely on PHP alone: in 2005–2009 any new code that reads request values gets them already filtered (see `compat.php`); in the Zend apps bind values (`where('x = ?', $v)`) and whitelist anything used as a column name or sort direction.
 - The 2005 search pages keep the generated SQL in the session (`2005/lib/query_store.php`) and only send a key to the browser; the classification autocomplete (2006–2009) builds its query server-side from form values. Never accept SQL from the client again.
-- Modules `bhl`, `images_ajax` and `map_*` are off in every `config.ini`; their controllers return 404 while off.
+- Modules `bhl` and `images_ajax` are off in every `config.ini`; their controllers return 404 while off. The Google Maps distribution maps (`map_*` modules, never enabled) were removed from 2013-2019, including region search by map and the polygon data.
 - Files mix CRLF and LF line endings and ISO-8859-1/UTF-8 encodings; edit byte-preserving.
 - The repo has ~14k files, mostly images. Scope searches to a specific year or to `etc/`, `docker/`, `scripts/` and `var/www/html/lib/compat.php`.
