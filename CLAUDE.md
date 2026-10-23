@@ -23,6 +23,8 @@ docker-compose logs checklists | grep -E 'PHP (Fatal|Warning)|Uncaught'
 docker run --rm -v "$PWD/var/www/html":/src -w /src php:8.4.27-apache php -l annual-checklist/2019/application/models/Search.php
 ```
 
+`scripts/natural_keys.sh [year]` exports the 2015–2019 natural keys (`_natural_keys`, the hashed ids in the public URLs) with the internal id that the edition's ChecklistBank dataset uses as usage id, to `data/col<year>_natural_keys.tsv.gz`. The 2019 file is published as `download.checklistbank.org/col/annual/2019_natural_keys.tsv.gz` and feeds the Varnish/Apache redirect of old 2019 links in `deploy` and the per-release COL19 → XR id mapping made by the backend.
+
 The SQL dumps (`data/mysql_col<year>ac.sql.zst`, plus `mysql_baseschema_2011_v19.sql.zst` for 2011) are not in git; download them from https://download.checklistbank.org/col/annual/ac_mysql/ (behind a cookie challenge; `MD5SUMS` alongside). Without them the apps can only be tested against the partial schemas in `<year>/application/data/db/` (2005–2009 work with the 2011 `schema.sql`; the 2011+ Zend apps need `_search_*` tables that only the dumps have).
 
 ## Architecture
