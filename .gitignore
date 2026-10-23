@@ -3,3 +3,7 @@ data/*.gz
 data/*.zstd
 var/lib/
 data/*.zst
+.DS_Store
+col-archives/data/*
+!col-archives/data/.gitkeep
+__pycache__/

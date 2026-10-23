@@ -13,7 +13,7 @@ A frozen, read-only re-hosting of the legacy Catalogue of Life **Annual Checklis
 echo DATABASE_PASSWORD=... > .env; echo DATABASE_RO_PASSWORD=... >> .env
 
 docker-compose up -d database             # MySQL 5.7, no host port, data persisted in ./var/lib/mysql
-docker-compose run provision              # create the 15 DBs, import all dumps (takes hours; once), create col_ro
+docker-compose run provision              # create the 15 DBs, import dumps not yet imported (hours; --force re-imports), create col_ro
 docker-compose run provision --users-only # only (re)create col_ro on an existing database
 docker-compose up -d --build checklists   # Apache + PHP on port 80; rebuild after ANY change (code is copied into the image)
 scripts/smoke.sh [base-url]               # every page must answer without 5xx; EXPECT=1 also checks known species pages
@@ -25,13 +25,13 @@ docker run --rm -v "$PWD/var/www/html":/src -w /src php:8.4.27-apache php -l ann
 
 `scripts/natural_keys.sh [year]` exports the 2015–2019 natural keys (`_natural_keys`, the hashed ids in the public URLs) with the internal id that the edition's ChecklistBank dataset uses as usage id, to `data/col<year>_natural_keys.tsv.gz`. The 2019 file is published as `download.checklistbank.org/col/annual/2019_natural_keys.tsv.gz` and feeds the Varnish/Apache redirect of old 2019 links in `deploy` and the per-release COL19 → XR id mapping made by the backend.
 
-The SQL dumps (`data/mysql_col<year>ac.sql.zst`, plus `mysql_baseschema_2011_v19.sql.zst` for 2011) are not in git; download them from https://download.checklistbank.org/col/annual/ac_mysql/ (behind a cookie challenge; `MD5SUMS` alongside). Without them the apps can only be tested against the partial schemas in `<year>/application/data/db/` (2005–2009 work with the 2011 `schema.sql`; the 2011+ Zend apps need `_search_*` tables that only the dumps have).
+The SQL dumps (`data/<year>_mysql.sql.zst`) are not in git; download them from `https://download.checklistbank.org/col/annual/<year>_mysql.sql.zst` (behind a cookie challenge; checksums in `mysql.md5` alongside). 2005–2010 use the old flat schema (`scientific_names`, `taxa`, `common_names`); 2011–2019 the new base scheme (`taxon`, `taxon_name_element`, `_search_*`). The 2011 dump is the original `baseschema_2011_v19` dump; a 2011 dump in the old schema (`col_dnp2011ac`) was dropped because no app reads it. Without them the apps can only be tested against the partial schemas in `<year>/application/data/db/` (2005–2009 work with the 2011 `schema.sql`; the 2011+ Zend apps need `_search_*` tables that only the dumps have).
 
 ## Architecture
 
 **Three compose services** (`docker-compose.yaml`):
 - `database` — MySQL 5.7 with deliberately legacy settings (`utf8`, MyISAM default engine, empty `sql-mode`, `mysql_native_password`). The old apps depend on the lax SQL mode; don't "fix" these flags.
-- `provision` — `scripts/provision.py`: applies `data/provision.sql` (creates `col2005ac` … `col2019ac`), pipes each dump into its DB, then creates `col_ro` (SELECT, EXECUTE). Adding a year means editing both files.
+- `provision` — `docker/provision.Dockerfile` with `scripts/provision.py` baked in (the root compose mounts `scripts/` over it): creates `col2005ac` … `col2019ac`, pipes each `data/<year>_mysql.sql.zst` into its DB (skipping missing dumps and already imported years), then creates `col_ro` (SELECT, EXECUTE).
 - `checklists` — `docker/httpd.Dockerfile`, pinned by tag and digest; bump both for each PHP security release. Copies `annual-checklist/` to `/var/www/annual-checklist`, the shared `lib/` to `/var/www/lib`, `etc/php/archives.ini` into conf.d and the single vhost `etc/apache2/sites-available/archives.conf`.
 
 **DB credentials come from the environment at runtime** (`DATABASE_USER`, `DATABASE_PASSWORD`, passed through by `PassEnv` in the vhost): `getenv()` in 2005 `connect_to_database.php`, 2006–2008 `ac_config.php`, 2009 `includes/config.php`, and in each Zend app's `Bootstrap::_initDatabase` (which overrides the blank `database.params.*` in `config.ini`). DB host is always `database`, DB name `col<year>ac`. Never commit credentials.
@@ -52,6 +52,8 @@ The SQL dumps (`data/mysql_col<year>ac.sql.zst`, plus `mysql_baseschema_2011_v19
 The pre-2010 apps use `lib/mysql.php` (php7-mysql-shim, patched for PHP 8 and with `mysqli_report(MYSQLI_REPORT_OFF)` so `or die()` paths still work); all five copies are identical, so change one and copy it. 2006–2009 share near-identical files, so fixes port across with small rebases. The Zend apps fall into four generations (2010; 2011–12; 2013–14; 2015–19); one patch usually applies to every year via the same method names (`fetchTaxaByRank`, `wildcardHandling`, `_selectDistributionsByIds`, `Renderer::escape`).
 
 **Apache routing** — one vhost for `archives.catalogueoflife.org` / `*.catalogueoflife.org` with an empty `DocumentRoot` and an `Alias /annual-checklist/<year>` per year pointing at `public/` for 2010+ and at the year root for 2005–2009. Each Zend app's `public/.htaccess` `RewriteBase` must match its alias. The vhost denies config/backup/text files and `2009/includes`, and sets CSP (`'unsafe-inline'`/`'unsafe-eval'` are needed by the old inline JS and Dojo 1.3).
+
+**Standalone setup and releases** — `col-archives/` is what end users get: a compose file using the published images `ghcr.io/catalogueoflife/archives-checklists` and `archives-provision` (`:latest` in git), fixed local default passwords (no MySQL host port, web on `127.0.0.1:8080`) and a README. Publishing a GitHub release runs `.github/workflows/release.yml`: multi-arch build and push of both images, tagged with the release tag and `latest`, then `col-archives-<tag>.zip` with the image tag pinned is attached to the release. Keep `col-archives/docker-compose.yml` in step with the root compose (MySQL flags, env names).
 
 ## Gotchas
 

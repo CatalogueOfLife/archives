@@ -1,0 +1,66 @@
+# On every published GitHub release: build and push the images to ghcr.io and attach col-archives-<tag>.zip,
+# the standalone setup in col-archives/ with the image tag pinned to the release.
+# After the first run, make both packages public in the package settings on GitHub.
+name: release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to build and attach the zip to
+        required: true
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  TAG: ${{ github.event.release.tag_name || inputs.tag }}
+  REGISTRY: ghcr.io/catalogueoflife
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push archives-checklists
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/httpd.Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ env.REGISTRY }}/archives-checklists:${{ env.TAG }},${{ env.REGISTRY }}/archives-checklists:latest
+          labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
+
+      - name: Build and push archives-provision
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/provision.Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ env.REGISTRY }}/archives-provision:${{ env.TAG }},${{ env.REGISTRY }}/archives-provision:latest
+          labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
+
+      - name: Attach col-archives-${{ env.TAG }}.zip
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sed -i "s|\(archives-[a-z]*\):latest|\1:${TAG}|" col-archives/docker-compose.yml
+          grep -q ":${TAG}\$" col-archives/docker-compose.yml
+          zip -r "col-archives-${TAG}.zip" col-archives
+          gh release upload "${TAG}" "col-archives-${TAG}.zip" --clobber

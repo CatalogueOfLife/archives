@@ -1,0 +1,53 @@
+# Run the CoL Annual Checklist archives (2005–2019) locally with the published images.
+# No checkout and no passwords needed; see README.md.
+#
+#   docker compose run --rm provision   # once: imports every data/<year>_mysql.sql.zst
+#   docker compose up -d
+#   open http://localhost:8080/annual-checklist/2019
+#
+# The passwords below are local defaults: MySQL has no host port and the web apps listen on localhost only.
+# Put DATABASE_PASSWORD / DATABASE_RO_PASSWORD / PORT into a .env file to change them.
+
+services:
+  database:
+    image: mysql:5.7
+    platform: linux/amd64          # there is no arm64 build of mysql:5.7
+    volumes:
+      - col-mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD:-colarchives}
+    # legacy settings the old apps depend on
+    command: ['mysqld', '--character-set-server=utf8', '--collation-server=utf8_general_ci', '--default_storage_engine=MYISAM', '--default-authentication-plugin=mysql_native_password', '--sql-mode=', '--innodb-temp-data-file-path=ibtmp1:12M:autoextend:max:1000M', '--default-tmp-storage-engine=MyISAM']
+    healthcheck:
+      test: ['CMD-SHELL', 'MYSQL_PWD="$$MYSQL_ROOT_PASSWORD" mysqladmin ping -uroot --silent']
+      interval: 5s
+      retries: 60
+    restart: unless-stopped
+
+  provision:
+    image: ghcr.io/catalogueoflife/archives-provision:latest
+    profiles: [provision]
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - ./data:/home/col/data:ro
+    environment:
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-colarchives}
+      DATABASE_RO_PASSWORD: ${DATABASE_RO_PASSWORD:-colarchives_ro}
+
+  checklists:
+    image: ghcr.io/catalogueoflife/archives-checklists:latest
+    depends_on:
+      database:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${PORT:-8080}:80"
+    environment:
+      # read-only account created by provision
+      DATABASE_USER: col_ro
+      DATABASE_PASSWORD: ${DATABASE_RO_PASSWORD:-colarchives_ro}
+    restart: unless-stopped
+
+volumes:
+  col-mysql:
