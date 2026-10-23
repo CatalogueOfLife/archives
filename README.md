@@ -1,7 +1,7 @@
 # CoL Annual Checklist Archives
 
-The legacy Catalogue of Life Annual Checklist web apps 2005–2019, served at
-https://archives.catalogueoflife.org/annual-checklist/2019.
+The legacy Catalogue of Life Annual Checklist web apps 2005–2019, kept running on a current PHP so that the old
+editions can still be browsed. They are for local use only; don't expose them to the internet.
 
 **Just want to browse the old checklists locally?** Download `col-archives-<version>.zip` from the
 [latest release](https://github.com/CatalogueOfLife/archives/releases/latest) and follow its README
@@ -54,23 +54,8 @@ scripts/smoke.sh            # every page must answer without a 5xx; EXPECT=1 als
 The web image is the official `php:8.4.27-apache` (Debian). Rebuild it whenever a new PHP 8.4 security release is
 published by bumping the tag and digest in `docker/httpd.Dockerfile`.
 
-The annual checklist are then available at:
-
-- http://archives.catalogueoflife.org/annual-checklist/2005
-- http://archives.catalogueoflife.org/annual-checklist/2006
-- http://archives.catalogueoflife.org/annual-checklist/2007
-- http://archives.catalogueoflife.org/annual-checklist/2008
-- http://archives.catalogueoflife.org/annual-checklist/2009
-- http://archives.catalogueoflife.org/annual-checklist/2010
-- http://archives.catalogueoflife.org/annual-checklist/2011
-- http://archives.catalogueoflife.org/annual-checklist/2012
-- http://archives.catalogueoflife.org/annual-checklist/2013
-- http://archives.catalogueoflife.org/annual-checklist/2014
-- http://archives.catalogueoflife.org/annual-checklist/2015
-- http://archives.catalogueoflife.org/annual-checklist/2016
-- http://archives.catalogueoflife.org/annual-checklist/2017
-- http://archives.catalogueoflife.org/annual-checklist/2018
-- http://archives.catalogueoflife.org/annual-checklist/2019
+The annual checklists are then available at http://localhost/annual-checklist/2005 to
+http://localhost/annual-checklist/2019.
 
 ---
 

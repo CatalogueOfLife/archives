@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A frozen, read-only re-hosting of the legacy Catalogue of Life **Annual Checklist** web apps for 2005–2019, served at `archives.catalogueoflife.org/annual-checklist/<year>`. Each year is the original PHP application as shipped back then, kept alive on PHP 8.4 (official `php:8.4.27-apache` image) and MySQL 5.7 via Docker Compose. This is not where current CoL work happens (that's `backend` / `portal`); changes here are about keeping old code running safely, not adding features. There is no build tooling, linter or unit test suite; `scripts/smoke.sh` is the end-to-end check.
+A frozen, read-only re-hosting of the legacy Catalogue of Life **Annual Checklist** web apps for 2005–2019, for local use only at `/annual-checklist/<year>` (no longer served publicly; formerly at `archives.catalogueoflife.org`). Each year is the original PHP application as shipped back then, kept alive on PHP 8.4 (official `php:8.4.27-apache` image) and MySQL 5.7 via Docker Compose. This is not where current CoL work happens (that's `backend` / `portal`); changes here are about keeping old code running safely, not adding features. There is no build tooling, linter or unit test suite; `scripts/smoke.sh` is the end-to-end check.
 
 ## Commands
 

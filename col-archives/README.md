@@ -1,8 +1,7 @@
 # CoL Annual Checklist archives (2005–2019), run locally
 
 This runs the old Catalogue of Life Annual Checklists on your own computer with Docker, using the images published
-by [CatalogueOfLife/archives](https://github.com/CatalogueOfLife/archives). The same apps are online at
-https://archives.catalogueoflife.org/annual-checklist/2019.
+by [CatalogueOfLife/archives](https://github.com/CatalogueOfLife/archives). They are for local use only.
 
 You need Docker with Compose 2.20 or newer (Docker Desktop, OrbStack or Docker Engine), and enough disk space for
 the years you want: an imported year takes roughly its uncompressed size, about 8× the dump (all years together
